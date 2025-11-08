@@ -8,6 +8,7 @@ name = "pypi"
 [dev-packages]
 fastapi = {extras = ["standard"] }
 requests = "*"
+psycopg2-binary = "*"
 
 [requires]
 python_version = "3.12"

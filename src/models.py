@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass, field
 from typing import Any, Dict, Optional
 
@@ -21,4 +22,15 @@ class Alert:
             status=status,
             labels=labels,
             fingerprint=alert_json.get("fingerprint"),
+        )
+
+    @staticmethod
+    def from_psql(record: tuple) -> Alert:
+        _, alertname, status, labels_json, fingerprint = record
+        labels = (
+            labels_json if isinstance(labels_json, dict) else json.loads(labels_json)
+        )
+
+        return Alert(
+            alertname=alertname, status=status, labels=labels, fingerprint=fingerprint
         )
