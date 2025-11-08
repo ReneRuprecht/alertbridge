@@ -7,6 +7,7 @@ name = "pypi"
 
 [dev-packages]
 fastapi = {extras = ["standard"] }
+requests = "*"
 
 [requires]
 python_version = "3.12"
