@@ -2,6 +2,8 @@ import logging
 import os
 from typing import List, Optional
 
+from datetime import datetime, timezone
+
 import requests
 from src.models.alert import Alert
 from src.repository.psql_client import PSQLClient
@@ -21,41 +23,32 @@ class AlertService:
         self.alertmanager_url = alertmanager_url or os.getenv("ALERTMANAGER_URL", None)
         self.logger = logger or logging.getLogger("AlertService")
 
-    def fetch_and_store_alerts_from_alertmanager(self) -> List[Alert]:
+    def _init_db_data_from_alertmanager(self) -> int:
         """
         Fetch alerts from alertmanager (/api/v2/alerts) and store them in DB
         """
         if not self.alertmanager_url:
             self.logger.warning("ALERTMANAGER_URL not set")
-            return []
+            return 0
 
         try:
             resp = requests.get(self.alertmanager_url + "/api/v2/alerts")
             resp.raise_for_status()
-            data = resp.json()
+            alerts_json = resp.json()
+            if not alerts_json:
+                self.logger.warning("Alerts from Alertmanager were empty")
+                return 0
+
+            if not isinstance(alerts_json, list):
+                self.logger.warning("Invalid payload: expected a list of alerts")
+                return 0
+
+            processed_alerts = self.save_alerts_to_db(alerts_json)
+
+            return processed_alerts
         except Exception as e:
             self.logger.error("Error fetching from Alertmanager: %s", e)
-            return []
-
-        alerts: List[Alert] = []
-        for alert_json in data:
-            try:
-                alert_obj = Alert.from_json(alert_json)
-            except Exception as e:
-                self.logger.warning(
-                    "Could not parse alert JSON: %s | %s", e, alert_json
-                )
-                continue
-
-            try:
-                self.psql_client.save_alert(alert_obj)
-            except Exception as e:
-                self.logger.error("Error saving alert to DB: %s", e)
-
-            alerts.append(alert_obj)
-
-        self.logger.info("Fetched and stored %d alerts", len(alerts))
-        return alerts
+            return 0
 
     def fetch_alerts_from_db(self) -> list[Alert]:
         """
@@ -79,3 +72,29 @@ class AlertService:
 
         self.logger.info("Fetched %d alerts", len(alerts))
         return alerts
+
+    def process_webhook_payload(self, payload: dict) -> list[dict]:
+        alerts_json = payload.get("alerts", [])
+
+        if not isinstance(alerts_json, list) or not alerts_json:
+            return []
+        return alerts_json
+
+    def save_alerts_to_db(self, alerts_json: list[dict]) -> int:
+        alerts: list[Alert] = []
+
+        for alert in alerts_json:
+            alert_obj = Alert.from_json(alert)
+
+            # Set ended_at only if resolved
+            if alert_obj.status == "resolved":
+                alert_obj.ended_at = datetime.now(timezone.utc)
+
+            alert_obj.updated_at = datetime.now(timezone.utc)
+            alerts.append(alert_obj)
+
+        if not alerts:
+            return 0
+
+        return self.psql_client.save_alerts_batch(alerts)
+
