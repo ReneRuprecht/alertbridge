@@ -61,9 +61,20 @@ class Alert:
         """
         Create an Alert object from database response.
         """
-        _, alertname, status, labels_json, fingerprint, starts_at, ended_at, updated_at = record
+        (
+            _,
+            alertname,
+            status,
+            labels_json,
+            fingerprint,
+            starts_at,
+            ended_at,
+            updated_at,
+        ) = record
 
-        labels = labels_json if isinstance(labels_json, dict) else json.loads(labels_json)
+        labels = (
+            labels_json if isinstance(labels_json, dict) else json.loads(labels_json)
+        )
 
         def ensure_tz(dt: Optional[datetime]) -> Optional[datetime]:
             if dt is None:

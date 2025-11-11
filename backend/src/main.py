@@ -20,18 +20,21 @@ alert_service: AlertService = AlertService(psql_client=psql_client)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    logging.info("Starting postgres connection")
+    await psql_client.create_pool(open=True)
+
     logging.info("Starting initial alert fetch from alertmanager")
-
-    alert_service._init_db_data_from_alertmanager()
-
+    await alert_service._init_db_data_from_alertmanager()
     logging.info("Initial alert fetch completed")
 
     yield
 
+    await psql_client.close_pool()
+
 
 @app.get("/alerts")
 async def alerts():
-    alerts = alert_service.fetch_alerts_from_db()
+    alerts = await alert_service.fetch_alerts_from_db()
 
     return {"alerts": alerts}
 
@@ -42,7 +45,7 @@ async def alert_manager_webhook(request: Request):
         data = await request.json()
 
         alert_json = alert_service.process_webhook_payload(data)
-        processed_alerts_count: int = alert_service.save_alerts_to_db(alert_json)
+        processed_alerts_count: int = await alert_service.save_alerts_to_db(alert_json)
 
         logging.info(
             "Processed %s alerts from Alertmanager webhook", processed_alerts_count

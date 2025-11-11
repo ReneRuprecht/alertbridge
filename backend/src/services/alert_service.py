@@ -1,10 +1,9 @@
 import logging
 import os
+from datetime import datetime, timezone
 from typing import List, Optional
 
-from datetime import datetime, timezone
-
-import requests
+import aiohttp
 from src.models.alert import Alert
 from src.repository.psql_client import PSQLClient
 
@@ -23,7 +22,7 @@ class AlertService:
         self.alertmanager_url = alertmanager_url or os.getenv("ALERTMANAGER_URL", None)
         self.logger = logger or logging.getLogger("AlertService")
 
-    def _init_db_data_from_alertmanager(self) -> int:
+    async def _init_db_data_from_alertmanager(self) -> int:
         """
         Fetch alerts from alertmanager (/api/v2/alerts) and store them in DB
         """
@@ -32,9 +31,14 @@ class AlertService:
             return 0
 
         try:
-            resp = requests.get(self.alertmanager_url + "/api/v2/alerts")
-            resp.raise_for_status()
-            alerts_json = resp.json()
+            alerts_json = None
+
+            async with aiohttp.ClientSession() as session:
+                async with session.get(
+                    self.alertmanager_url + "/api/v2/alerts"
+                ) as resp:
+                    alerts_json = await resp.json()
+
             if not alerts_json:
                 self.logger.warning("Alerts from Alertmanager were empty")
                 return 0
@@ -43,19 +47,19 @@ class AlertService:
                 self.logger.warning("Invalid payload: expected a list of alerts")
                 return 0
 
-            processed_alerts = self.save_alerts_to_db(alerts_json)
+            processed_alerts = await self.save_alerts_to_db(alerts_json)
 
             return processed_alerts
         except Exception as e:
             self.logger.error("Error fetching from Alertmanager: %s", e)
             return 0
 
-    def fetch_alerts_from_db(self) -> list[Alert]:
+    async def fetch_alerts_from_db(self) -> list[Alert]:
         """
         Fetch alerts from db
         """
         try:
-            rows = self.psql_client.read_alerts()
+            rows = await self.psql_client.read_alerts()
         except Exception as e:
 
             self.logger.error("Error reading from DB: %s", e)
@@ -80,7 +84,7 @@ class AlertService:
             return []
         return alerts_json
 
-    def save_alerts_to_db(self, alerts_json: list[dict]) -> int:
+    async def save_alerts_to_db(self, alerts_json: list[dict]) -> int:
         alerts: list[Alert] = []
 
         for alert in alerts_json:
@@ -96,5 +100,4 @@ class AlertService:
         if not alerts:
             return 0
 
-        return self.psql_client.save_alerts_batch(alerts)
-
+        return await self.psql_client.save_alerts_batch(alerts)
