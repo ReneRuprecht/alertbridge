@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS alerts_history (
     labels JSONB,
     fingerprint TEXT NOT NULL,
     starts_at TIMESTAMPTZ,
-    ends_at TIMESTAMPTZ, 
-    UNIQUE(fingerprint, status, labels, starts_at)
+    ended_at TIMESTAMPTZ, 
+    updated_at TIMESTAMPTZ, 
+    UNIQUE(fingerprint, status, starts_at)
 );

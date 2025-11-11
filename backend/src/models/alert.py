@@ -14,7 +14,8 @@ class Alert:
     fingerprint: str
 
     starts_at: Optional[datetime]
-    ends_at: Optional[datetime]
+    ended_at: Optional[datetime]
+    updated_at: Optional[datetime]
 
     @staticmethod
     def from_json(alert_json: dict[str, Any]) -> Alert:
@@ -23,7 +24,15 @@ class Alert:
         """
 
         labels = alert_json.get("labels", {})
-        status = alert_json["status"]["state"]
+        status = ""
+        status_field = alert_json.get("status", "")
+        if isinstance(status_field, dict):
+            status = status_field.get("state", "")
+            # Change status to firing, Alertmanager sends 'active' on /api/v2/alerts
+            if status == "active":
+                status = "firing"
+        elif isinstance(status_field, str):
+            status = status_field
 
         def parse_datetime(dt_str: Optional[str]) -> Optional[datetime]:
             if not dt_str:
@@ -34,7 +43,8 @@ class Alert:
                 return None
 
         starts_at = parse_datetime(alert_json.get("startsAt"))
-        ends_at = parse_datetime(alert_json.get("endsAt"))
+        updated_at = parse_datetime(alert_json.get("updatedAt"))
+        ended_at = None
 
         return Alert(
             alertname=labels.get("alertname", "unknown"),
@@ -42,7 +52,8 @@ class Alert:
             labels=labels,
             fingerprint=str(alert_json.get("fingerprint")),
             starts_at=starts_at,
-            ends_at=ends_at,
+            ended_at=ended_at,
+            updated_at=updated_at,
         )
 
     @staticmethod
@@ -50,7 +61,7 @@ class Alert:
         """
         Create an Alert object from database response.
         """
-        _, alertname, status, labels_json, fingerprint, starts_at, ends_at = record
+        _, alertname, status, labels_json, fingerprint, starts_at, ended_at, updated_at = record
 
         labels = labels_json if isinstance(labels_json, dict) else json.loads(labels_json)
 
@@ -67,5 +78,6 @@ class Alert:
             labels=labels,
             fingerprint=fingerprint,
             starts_at=ensure_tz(starts_at),
-            ends_at=ensure_tz(ends_at),
+            ended_at=ensure_tz(ended_at),
+            updated_at=ensure_tz(updated_at),
         )
