@@ -4,6 +4,7 @@ import os
 from typing import List, Optional, Tuple
 
 from psycopg_pool import AsyncConnectionPool
+
 from src.models.alert import Alert
 
 

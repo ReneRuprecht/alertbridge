@@ -28,7 +28,8 @@ class Alert:
         status_field = alert_json.get("status", "")
         if isinstance(status_field, dict):
             status = status_field.get("state", "")
-            # Change status to firing, Alertmanager sends 'active' on /api/v2/alerts
+            # Change status to firing,
+            # Alertmanager sends 'active' on /api/v2/alerts
             if status == "active":
                 status = "firing"
         elif isinstance(status_field, str):
@@ -73,7 +74,9 @@ class Alert:
         ) = record
 
         labels = (
-            labels_json if isinstance(labels_json, dict) else json.loads(labels_json)
+            labels_json
+            if isinstance(labels_json, dict)
+            else json.loads(labels_json)
         )
 
         def ensure_tz(dt: Optional[datetime]) -> Optional[datetime]:
@@ -91,4 +94,14 @@ class Alert:
             starts_at=ensure_tz(starts_at),
             ended_at=ensure_tz(ended_at),
             updated_at=ensure_tz(updated_at),
+        )
+
+    def to_redis(self) -> str:
+        return json.dumps(
+            {
+                "alertname": self.alertname,
+                "status": self.status,
+                "fingerprint": self.fingerprint,
+                "instance": self.labels.get("instance", ""),
+            }
         )
