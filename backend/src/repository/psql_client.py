@@ -1,11 +1,8 @@
-import json
 import logging
 import os
 from typing import List, Optional, Tuple
 
 from psycopg_pool import AsyncConnectionPool
-
-from src.models.alert import Alert
 
 
 class PSQLClient:
@@ -89,9 +86,9 @@ class PSQLClient:
                 self.logger.error("Error while fetching alerts: %s", e)
                 return []
 
-    async def save_alerts_batch(self, alerts: list[Alert]) -> int:
+    async def save_alerts(self, values: list[tuple]) -> int:
         """
-        Insert multiple alerts to db
+        Save multiple alerts to db
         """
         self._check_pool(strict=True)
         assert self.pool is not None
@@ -107,27 +104,15 @@ class PSQLClient:
                     VALUES (%s,%s,%s,%s,%s,%s,%s)
                     ON CONFLICT (fingerprint, status, starts_at) DO NOTHING;
                     """
-                    values = [
-                        (
-                            alert.alertname,
-                            alert.status,
-                            json.dumps(alert.labels),
-                            alert.fingerprint,
-                            alert.starts_at,
-                            alert.ended_at,
-                            alert.updated_at,
-                        )
-                        for alert in alerts
-                    ]
 
                     await cur.executemany(query, values)
 
                 await conn.commit()
-                self.logger.info("Inserted %d alerts (batch)", len(values))
+                self.logger.info("Inserted %d alerts", len(values))
                 return len(values)
 
             except Exception as e:
-                self.logger.error("Batch insert failed: %s", e)
+                self.logger.error("Insertion of alerts failed: %s", e)
                 await conn.rollback()
 
         return 0

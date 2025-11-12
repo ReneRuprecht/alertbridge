@@ -1,122 +1,92 @@
 import logging
-import os
-from datetime import datetime, timezone
-from typing import List, Optional
-
-import aiohttp
+from typing import Optional
 
 from src.models.alert import Alert
-from src.repository.psql_client import PSQLClient
-from src.repository.redis_client import RedisClient
+from src.models.alert_frontend import FrontendAlert
+from src.services.alerts.http_alert_service import HttpAlertService
+from src.services.alerts.psql_alert_service import PSQLAlertService
+from src.services.alerts.redis_http_service import RedisAlertService
 
 
 class AlertService:
     def __init__(
         self,
-        psql_client: PSQLClient,
-        redis_client: RedisClient,
-        alertmanager_url: Optional[str] = None,
+        psql_service: PSQLAlertService,
+        redis_service: RedisAlertService,
+        http_alert_service: HttpAlertService,
         logger: Optional[logging.Logger] = None,
     ):
         """
         Initialize the AlertService.
         """
-        self.psql_client = psql_client
-        self.redis_client = redis_client
-        self.alertmanager_url = alertmanager_url or os.getenv(
-            "ALERTMANAGER_URL", None
-        )
+        self.psql_service = psql_service
+        self.redis_service = redis_service
+        self.http_service = http_alert_service
+
         self.logger = logger or logging.getLogger("AlertService")
 
-    async def _init_db_data_from_alertmanager(self) -> int:
+    async def initial_setup_from_alertmanager(self) -> int:
         """
-        Fetch alerts from alertmanager (/api/v2/alerts) and store them in DB
+        Initialize the db with data from the alertmanager
+
+        Return the number of inserted records
         """
-        if not self.alertmanager_url:
-            self.logger.warning("ALERTMANAGER_URL not set")
-            return 0
 
         try:
-            alerts_json = None
-
-            async with aiohttp.ClientSession() as session:
-                async with session.get(
-                    self.alertmanager_url + "/api/v2/alerts"
-                ) as resp:
-                    alerts_json = await resp.json()
-
+            alerts_json = (
+                await self.http_service.fetch_alerts_from_alertmanager()
+            )
             if not alerts_json:
-                self.logger.warning("Alerts from Alertmanager were empty")
                 return 0
 
-            if not isinstance(alerts_json, list):
-                self.logger.warning(
-                    "Invalid payload: expected a list of alerts"
-                )
-                return 0
-
-            processed_alerts = await self.save_alerts_to_db(alerts_json)
+            processed_alerts = await self.save_alerts(alerts_json)
 
             return processed_alerts
         except Exception as e:
             self.logger.error("Error fetching from Alertmanager: %s", e)
             return 0
 
-    async def fetch_alerts_from_db(self) -> list[Alert]:
+    async def save_alerts_from_webhook(self, payload: dict) -> int:
         """
-        Fetch alerts from db
+        Proccess the alertmanager webhook payload
+
+        Return count of inserted alerts
         """
-        try:
-            rows = await self.psql_client.read_alerts()
-        except Exception as e:
+        alerts_json = self.http_service.extract_alerts(payload=payload)
+        if not alerts_json:
+            return 0
 
-            self.logger.error("Error reading from DB: %s", e)
-            return []
+        return await self.save_alerts(alerts_json=alerts_json)
 
-        alerts: List[Alert] = []
-        for row in rows:
-            try:
-                alert = Alert.from_psql(row)
-            except Exception as e:
-                self.logger.error(
-                    "Could not map DB row to Alert: %s | %s", e, row
-                )
-                continue
-            alerts.append(alert)
+    async def save_alerts(self, alerts_json: list[dict]) -> int:
+        """
+        Save alerts to psql and redis
 
-        for alert in alerts:
-            await self.redis_client.read_alert(alert)
-
-        self.logger.info("Fetched %d alerts", len(alerts))
-        return alerts
-
-    def process_webhook_payload(self, payload: dict) -> list[dict]:
-        alerts_json = payload.get("alerts", [])
-
-        if not isinstance(alerts_json, list) or not alerts_json:
-            return []
-        return alerts_json
-
-    async def save_alerts_to_db(self, alerts_json: list[dict]) -> int:
-        alerts: list[Alert] = []
-
-        for alert in alerts_json:
-            alert_obj = Alert.from_json(alert)
-
-            # Set ended_at only if resolved
-            if alert_obj.status == "resolved":
-                alert_obj.ended_at = datetime.now(timezone.utc)
-
-            alert_obj.updated_at = datetime.now(timezone.utc)
-            alerts.append(alert_obj)
+        Return count of inserted alerts
+        """
+        alerts = self.parse_alerts_json(alerts_json)
 
         if not alerts:
             return 0
 
-        await self.redis_client.insert_alerts(alerts)
-        result_count = await self.psql_client.save_alerts_batch(alerts)
+        redis_result_count = await self.redis_service.save_alerts(alerts)
+        psql_result_count = await self.psql_service.save_alerts(alerts)
 
-        return result_count
+        if redis_result_count != psql_result_count:
+            self.logger.info("Redis / PSQL inserted alerts not the same!")
 
-    async def read_all(self):
-        return await self.redis_client.read_alerts_frontend()
+        return psql_result_count
+
+    async def read_alerts_from_db(self):
+        return await self.psql_service.read_alerts_from_db()
+
+    def parse_alerts_json(self, alerts_json: list[dict]) -> list[Alert]:
+        alerts: list[Alert] = []
+
+        for alert in alerts_json:
+            alerts.append(Alert.from_json(alert))
+
+        return alerts
+
+    async def read_alerts_from_redis(self) -> list[FrontendAlert]:
+        return await self.redis_service.read_all_alerts_from_redis()

@@ -4,9 +4,6 @@ from typing import Optional
 
 import redis.asyncio as redis
 
-from src.models.alert import Alert
-from src.models.alert_frontend import FrontendAlert
-
 
 class RedisClient:
     def __init__(
@@ -58,46 +55,48 @@ class RedisClient:
             return False
         return True
 
-    async def insert_alerts(self, alerts: list[Alert]):
+    async def save_alerts(self, alerts: list[dict]) -> int:
         await self._check_conn()
 
         assert self.client is not None
         try:
             async with self.client.pipeline(transaction=True) as pipe:
                 for alert in alerts:
-                    ex = 120 if alert.status == "resolved" else 300
+                    ex = 120 if alert["status"] == "resolved" else 300
                     await pipe.set(
-                        f"alert:{alert.fingerprint}",
-                        alert.to_redis(),
+                        f"alert:{alert['fingerprint']}",
+                        json.dumps(alert),
                         ex=ex,
                     )
                 await pipe.execute()
 
             self.logger.info(f"Inserted {len(alerts)}")
+            return len(alerts)
 
         except Exception as e:
             self.logger.info(f"Failed to insert alerts: {e}")
+            return 0
 
-    async def read_alert(self, alert: Alert) -> Optional[FrontendAlert]:
+    async def read_alert(self, fingerprint: str) -> Optional[dict]:
         await self._check_conn()
         assert self.client is not None
 
         try:
-            data = await self.client.get(alert.fingerprint)
+            data = await self.client.get(f"alert:{fingerprint}")
             if isinstance(data, bytes):
                 data = data.decode()
             if isinstance(data, str):
                 data = json.loads(data)
 
-            frontend_alert = FrontendAlert.from_dict(data)
-            self.logger.info(f"READ READIS {frontend_alert.fingerprint}")
-            return frontend_alert
+            # frontend_alert = FrontendAlert.from_dict(data)
+            self.logger.info(f"READ READIS {fingerprint}")
+            return data
 
         except Exception as e:
             self.logger.error(f"Error while reading alert: {e}")
             return None
 
-    async def read_alerts_frontend(self) -> list[FrontendAlert]:
+    async def read_alerts_frontend(self) -> list[dict]:
         await self._check_conn()
         assert self.client is not None
 
@@ -109,9 +108,9 @@ class RedisClient:
                     await pipe.get(key)
                 value = await pipe.execute()
 
-            alerts: list[FrontendAlert] = []
+            alerts: list[dict] = []
             for val in value:
-                alerts.append(FrontendAlert.from_dict(json.loads(val)))
+                alerts.append(json.loads(val))
 
             return alerts
 

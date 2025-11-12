@@ -35,6 +35,9 @@ class Alert:
         elif isinstance(status_field, str):
             status = status_field
 
+        if status == "resolved":
+            ended_at = datetime.now(timezone.utc)
+
         def parse_datetime(dt_str: Optional[str]) -> Optional[datetime]:
             if not dt_str:
                 return None
@@ -44,7 +47,9 @@ class Alert:
                 return None
 
         starts_at = parse_datetime(alert_json.get("startsAt"))
-        updated_at = parse_datetime(alert_json.get("updatedAt"))
+        updated_at = parse_datetime(
+            alert_json.get("updatedAt", datetime.now(timezone.utc))
+        )
         ended_at = None
 
         return Alert(
@@ -96,12 +101,10 @@ class Alert:
             updated_at=ensure_tz(updated_at),
         )
 
-    def to_redis(self) -> str:
-        return json.dumps(
-            {
-                "alertname": self.alertname,
-                "status": self.status,
-                "fingerprint": self.fingerprint,
-                "instance": self.labels.get("instance", ""),
-            }
-        )
+    def to_redis_minimal_dict(self) -> dict:
+        return {
+            "alertname": self.alertname,
+            "status": self.status,
+            "fingerprint": self.fingerprint,
+            "instance": self.labels.get("instance", ""),
+        }
