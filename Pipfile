@@ -9,6 +9,7 @@ name = "pypi"
 fastapi = {extras = ["standard"] }
 psycopg = {extras = ["pool"], version = "*"}
 aiohttp = "*"
+redis = "*"
 
 [requires]
 python_version = "3.12"

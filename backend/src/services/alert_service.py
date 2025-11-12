@@ -4,14 +4,17 @@ from datetime import datetime, timezone
 from typing import List, Optional
 
 import aiohttp
+
 from src.models.alert import Alert
 from src.repository.psql_client import PSQLClient
+from src.repository.redis_client import RedisClient
 
 
 class AlertService:
     def __init__(
         self,
         psql_client: PSQLClient,
+        redis_client: RedisClient,
         alertmanager_url: Optional[str] = None,
         logger: Optional[logging.Logger] = None,
     ):
@@ -19,7 +22,10 @@ class AlertService:
         Initialize the AlertService.
         """
         self.psql_client = psql_client
-        self.alertmanager_url = alertmanager_url or os.getenv("ALERTMANAGER_URL", None)
+        self.redis_client = redis_client
+        self.alertmanager_url = alertmanager_url or os.getenv(
+            "ALERTMANAGER_URL", None
+        )
         self.logger = logger or logging.getLogger("AlertService")
 
     async def _init_db_data_from_alertmanager(self) -> int:
@@ -44,7 +50,9 @@ class AlertService:
                 return 0
 
             if not isinstance(alerts_json, list):
-                self.logger.warning("Invalid payload: expected a list of alerts")
+                self.logger.warning(
+                    "Invalid payload: expected a list of alerts"
+                )
                 return 0
 
             processed_alerts = await self.save_alerts_to_db(alerts_json)
@@ -70,9 +78,14 @@ class AlertService:
             try:
                 alert = Alert.from_psql(row)
             except Exception as e:
-                self.logger.error("Could not map DB row to Alert: %s | %s", e, row)
+                self.logger.error(
+                    "Could not map DB row to Alert: %s | %s", e, row
+                )
                 continue
             alerts.append(alert)
+
+        for alert in alerts:
+            await self.redis_client.read_alert(alert)
 
         self.logger.info("Fetched %d alerts", len(alerts))
         return alerts
@@ -100,4 +113,10 @@ class AlertService:
         if not alerts:
             return 0
 
-        return await self.psql_client.save_alerts_batch(alerts)
+        await self.redis_client.insert_alerts(alerts)
+        result_count = await self.psql_client.save_alerts_batch(alerts)
+
+        return result_count
+
+    async def read_all(self):
+        return await self.redis_client.read_alerts_frontend()

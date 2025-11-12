@@ -16,12 +16,12 @@ defineProps<{ alerts: Alert[]; loading: boolean }>()
     </thead>
     <tbody class="divide-y divide-gray-200">
       <tr v-for="alert in alerts" :key="alert.fingerprint">
-        <td class="px-4 py-2">{{ alert.labels.instance }}</td>
+        <td class="px-4 py-2">{{ alert.instance }}</td>
         <td class="px-4 py-2">{{ alert.alertname }}</td>
         <td class="px-4 py-2">
           <span
             :class="{
-              'text-red-600 font-semibold': alert.status === 'active',
+              'text-red-600 font-semibold': alert.status === 'firing',
               'text-green-600': alert.status === 'resolved',
               'text-black': !['active', 'resolved'].includes(alert.status),
             }"

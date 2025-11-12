@@ -8,7 +8,10 @@ const loading = ref(true)
 
 onMounted(async () => {
   try {
-    alerts.value = await fetchAlerts()
+    setInterval(async () => {
+        alerts.value = await fetchAlerts()
+        console.log("fetch alerts")
+    }, 3000);
   } catch (err) {
     console.error('Failed to fetch alerts:', err)
   } finally {
