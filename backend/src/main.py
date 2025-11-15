@@ -1,14 +1,21 @@
-import logging
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from psycopg_pool import AsyncConnectionPool
 
-from src.repository.psql_client import PSQLClient
-from src.repository.redis_client import RedisClient
-from src.services.alert_service import AlertService
-
-logging.basicConfig(level=logging.INFO)
+from src.api.v1.alerts_router import router as alerts_router
+from src.api.v1.dependencies.cache.cache import (
+    get_insert_current_alerts_usecase,
+)
+from src.api.v1.dependencies.db.db import get_alert_repository
+from src.api.v1.dependencies.http.http import get_fetch_alerts_usecase
+from src.application.services.logger_factory import get_logger_factory
+from src.domain.entities.alert import Alert
+from src.infrastructure.http.client import shutdown_http_client
+from src.infrastructure.postgres.alert_repository import (
+    AlertPostgresHistoricalRepository,
+)
 
 app = FastAPI()
 
@@ -16,59 +23,30 @@ origins = ["http://localhost:5173"]
 
 app.add_middleware(CORSMiddleware, allow_origins=origins)
 
-psql_client: PSQLClient = PSQLClient()
-redis_client: RedisClient = RedisClient()
-alert_service: AlertService = AlertService(
-    psql_client=psql_client, redis_client=redis_client
-)
+
+async def fetch_and_save_current_alerts():
+    fetch_alerts_usecase = await get_fetch_alerts_usecase()
+    alerts: list[Alert] = await fetch_alerts_usecase.execute()
+    insert_current_alerts_usecase = await get_insert_current_alerts_usecase()
+    await insert_current_alerts_usecase.execute(alerts=alerts)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logging.info("Starting postgres connection")
-    await psql_client.create_pool(open=True)
-    redis_client.connect()
-
-    logging.info("Starting initial alert fetch from alertmanager")
-    await alert_service._init_db_data_from_alertmanager()
-    logging.info("Initial alert fetch completed")
+    logger_factory = await get_logger_factory()
+    logger = logger_factory.get("App")
+    logger.info("Starting postgres connection")
+    await fetch_and_save_current_alerts()
 
     yield
 
-    await psql_client.close_pool()
-
-
-@app.get("/alerts")
-async def alerts():
-    alerts = await alert_service.fetch_alerts_from_db()
-
-    return {"alerts": alerts}
-
-
-@app.get("/alerts/minimal")
-async def alerts_minimal():
-    alerts = await alert_service.read_all()
-
-    return {"alerts": alerts}
-
-
-@app.post("/api/v1/alerts")
-async def alert_manager_webhook(request: Request):
-    try:
-        data = await request.json()
-
-        alert_json = alert_service.process_webhook_payload(data)
-        processed_alerts_count: int = await alert_service.save_alerts_to_db(
-            alert_json
-        )
-
-        logging.info(
-            "Processed %s alerts from Alertmanager webhook",
-            processed_alerts_count,
-        )
-
-    except Exception as e:
-        logging.error("Failed to process webhook: %s", e)
+    logger.info("Close pool")
+    psql: AlertPostgresHistoricalRepository = await get_alert_repository()
+    pool: AsyncConnectionPool = psql.pool
+    await pool.close()
+    await shutdown_http_client()
 
 
 app.router.lifespan_context = lifespan
+
+app.include_router(alerts_router)

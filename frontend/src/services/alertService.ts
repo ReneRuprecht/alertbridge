@@ -12,7 +12,7 @@ export interface AlertResponse {
 const API_BASE = 'http://localhost:8000'
 
 export async function fetchAlerts(): Promise<Alert[]> {
-  const res = await fetch(`${API_BASE}/alerts/minimal`)
+  const res = await fetch(`${API_BASE}/api/v1/alerts/current`)
 
   if (!res.ok) {
     throw new Error(`Failed to fetch alerts: ${res.status}`)
