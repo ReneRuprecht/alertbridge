@@ -2,7 +2,7 @@ from src.application.services.logger_factory import get_logger_factory
 from src.application.usecases.postgres.read_historical_alerts_usecase import (
     ReadHistoricalAlertsUseCase,
 )
-from src.application.usecases.postgres.save_alerts_usecase import (
+from src.application.usecases.postgres.save_historical_alerts_usecase import (
     SaveHistoricalAlertsUseCase,
 )
 from src.config.services.db.postgres import get_postgres_db_pool

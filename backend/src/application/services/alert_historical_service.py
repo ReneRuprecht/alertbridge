@@ -5,7 +5,7 @@ from src.application.usecases.http.fetch_alerts_usecase import (
 from src.application.usecases.postgres.read_historical_alerts_usecase import (
     ReadHistoricalAlertsUseCase,
 )
-from src.application.usecases.postgres.save_alerts_usecase import (
+from src.application.usecases.postgres.save_historical_alerts_usecase import (
     SaveHistoricalAlertsUseCase,
 )
 from src.domain.entities.alert import Alert
