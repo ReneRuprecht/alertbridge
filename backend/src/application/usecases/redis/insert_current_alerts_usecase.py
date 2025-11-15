@@ -9,4 +9,4 @@ class InsertCurrentAlertsUseCase:
         self.cache_repo = cache_repo
 
     async def execute(self, alerts: list[Alert]) -> int:
-        return await self.cache_repo.insert_current_alerts(alerts)
+        return await self.cache_repo.insert_current_alerts(alerts=alerts)

@@ -1,10 +1,10 @@
 from src.application.ports.logger_factory_port import LoggerFactoryPort
 from src.application.services.logger_factory import get_logger_factory
+from src.application.usecases.redis.insert_current_alerts_usecase import (
+    InsertCurrentAlertsUseCase,
+)
 from src.application.usecases.redis.read_current_alerts_usecase import (
     ReadCurrentAlertsUseCase,
-)
-from src.application.usecases.redis.save_current_alerts_usecase import (
-    InsertCurrentAlertsUseCase,
 )
 from src.config.services.cache.redis import get_redis_cache_client
 from src.domain.ports.alert_cache_repository_port import (

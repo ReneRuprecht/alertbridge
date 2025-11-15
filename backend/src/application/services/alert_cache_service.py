@@ -1,9 +1,9 @@
 from src.application.dto.alert_redis_dto import AlertRedisDto
+from src.application.usecases.redis.insert_current_alerts_usecase import (
+    InsertCurrentAlertsUseCase,
+)
 from src.application.usecases.redis.read_current_alerts_usecase import (
     ReadCurrentAlertsUseCase,
-)
-from src.application.usecases.redis.save_current_alerts_usecase import (
-    InsertCurrentAlertsUseCase,
 )
 from src.domain.entities.alert import Alert
 
