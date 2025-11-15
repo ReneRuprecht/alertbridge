@@ -1,7 +1,9 @@
 import aiohttp
 
+from src.application.ports.alert_external_source_port import (
+    AlertExternalSourcePort,
+)
 from src.domain.entities.alert import Alert
-from src.domain.ports.alert_external_source_port import AlertExternalSourcePort
 from src.infrastructure.alertmanager.mappers.alertmanager_mapper import (
     external_alert_json_to_domain,
 )

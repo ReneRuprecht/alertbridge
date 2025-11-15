@@ -1,5 +1,7 @@
+from src.application.ports.alert_external_source_port import (
+    AlertExternalSourcePort,
+)
 from src.domain.entities.alert import Alert
-from src.domain.ports.alert_external_source_port import AlertExternalSourcePort
 
 
 class FetchAlertsUseCase:
