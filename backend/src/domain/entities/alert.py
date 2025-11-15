@@ -10,6 +10,6 @@ class Alert(BaseModel):
     labels: Dict[str, str]
     fingerprint: str
 
-    starts_at: Optional[datetime]
-    ended_at: Optional[datetime]
-    updated_at: Optional[datetime]
+    starts_at: Optional[datetime] = None
+    ended_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
