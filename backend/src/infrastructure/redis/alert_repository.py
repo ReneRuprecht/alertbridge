@@ -1,6 +1,6 @@
 import redis.asyncio as redis
 
-from src.application.dto.alert_redis_dto import AlertRedisDto
+from src.application.dtos.alert_redis_dto import AlertRedisDto
 from src.application.ports.logger_factory_port import LoggerFactoryPort
 from src.domain.entities.alert import Alert
 from src.domain.ports.alert_cache_repository_port import (

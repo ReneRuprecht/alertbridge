@@ -1,4 +1,4 @@
-from src.application.dto.alert_redis_dto import AlertRedisDto
+from src.application.dtos.alert_redis_dto import AlertRedisDto
 from src.domain.ports.alert_cache_repository_port import (
     AlertCacheRepositoryPort,
 )

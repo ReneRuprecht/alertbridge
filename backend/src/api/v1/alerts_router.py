@@ -7,7 +7,7 @@ from src.api.v1.deps import (
 from src.api.v1.mappers.alertmanager_api_mapper import (
     alertmanager_payload_to_alerts,
 )
-from src.application.dto.alert_redis_dto import AlertRedisDto
+from src.application.dtos.alert_redis_dto import AlertRedisDto
 from src.application.ports.logger_factory_port import LoggerFactoryPort
 from src.application.ports.logger_port import LoggerPort
 from src.application.services.alert_cache_service import AlertCacheService
