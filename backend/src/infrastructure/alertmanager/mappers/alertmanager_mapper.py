@@ -17,9 +17,6 @@ def external_alert_json_to_domain(alert_json: dict) -> Alert:
     elif isinstance(status_field, str):
         status = status_field
 
-    if status == "resolved":
-        ended_at = datetime.now(timezone.utc)
-
     def parse_datetime(dt_str: Optional[str]) -> Optional[datetime]:
         if not dt_str:
             return None
@@ -28,11 +25,9 @@ def external_alert_json_to_domain(alert_json: dict) -> Alert:
         except Exception:
             return None
 
-    starts_at = parse_datetime(alert_json.get("startsAt"))
-    updated_at = parse_datetime(
-        alert_json.get("updatedAt", datetime.now(timezone.utc))
-    )
-    ended_at = None
+    starts_at = parse_datetime(alert_json.get("startsAt", ""))
+    ended_at = parse_datetime(alert_json.get("endsAt", ""))
+    updated_at = datetime.now(timezone.utc)
 
     return Alert(
         alertname=labels.get("alertname", "unknown"),
