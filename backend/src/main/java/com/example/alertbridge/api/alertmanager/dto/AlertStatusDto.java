@@ -2,11 +2,11 @@ package com.example.alertbridge.api.alertmanager.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
-public enum AlertStatus {
+public enum AlertStatusDto {
     FIRING, RESOLVED, UNKNOWN;
 
     @JsonCreator
-    public static AlertStatus fromString(String value) {
+    public static AlertStatusDto fromString(String value) {
         if (value == null) return UNKNOWN;
 
         return switch (value.toLowerCase()) {
