@@ -1,8 +1,4 @@
 package com.example.alertbridge.api.alertmanager.dto;
 
-public class AlertDto {
-    public String fingerprint;
-    public AlertStatus status;
-    public AlertLabels labels;
-    public String startsAt;
+public record AlertDto(String fingerprint, AlertStatus status, AlertLabelsDto labels, String startsAt) {
 }

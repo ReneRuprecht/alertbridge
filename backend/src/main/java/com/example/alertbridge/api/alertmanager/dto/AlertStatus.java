@@ -6,7 +6,7 @@ public enum AlertStatus {
     FIRING, RESOLVED, UNKNOWN;
 
     @JsonCreator
-    public static AlertStatus fromValue(String value) {
+    public static AlertStatus fromString(String value) {
         if (value == null) return UNKNOWN;
 
         return switch (value.toLowerCase()) {
