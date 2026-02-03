@@ -51,9 +51,7 @@ public class InMemoryAlertStateRepositoryTest {
 
         List<AlertState> active = repo.findAllActive();
 
-        assertThat(active)
-                .hasSize(2)
-                .allMatch(AlertState::isActive);
+        assertThat(active).hasSize(2).allMatch(AlertState::isActive);
     }
 
 

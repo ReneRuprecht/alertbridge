@@ -39,10 +39,7 @@ public class GetCurrentAlertStatesUseCaseTest {
         assertThat(activeAlerts)
                 .hasSize(2)
                 .extracting(AlertState::fingerprint)
-                .containsExactlyInAnyOrder(
-                        firing1.fingerprint(),
-                        firing2.fingerprint()
-                );
+                .containsExactlyInAnyOrder(firing1.fingerprint(), firing2.fingerprint());
 
         assertThat(activeAlerts).allMatch(AlertState::isActive);
     }

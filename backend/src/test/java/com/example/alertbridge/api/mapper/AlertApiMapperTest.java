@@ -59,17 +59,26 @@ public class AlertApiMapperTest {
     void shouldThrowIfFingerprintInvalid() {
         AlertDto dto = TestFixtures.alertDto(null, AlertStatusDto.FIRING, "prod");
 
-        assertThrows(IllegalArgumentException.class,
-                () -> mapper.toEvent(dto));
+        assertThrows(IllegalArgumentException.class, () -> mapper.toEvent(dto));
     }
 
     @Test
     void shouldThrowIfLabelFieldsInvalid() {
-        AlertLabelsDto labelsDto = new AlertLabelsDto("", "", "", "", AlertSeverityDto.fromString("INFO"));
-        AlertDto dto = new AlertDto("fp-001", AlertStatusDto.fromString("firing"), labelsDto, Instant.now().toString());
+        AlertLabelsDto labelsDto = new AlertLabelsDto(
+                "",
+                "",
+                "",
+                "",
+                AlertSeverityDto.fromString("INFO")
+        );
+        AlertDto dto = new AlertDto(
+                "fp-001",
+                AlertStatusDto.fromString("firing"),
+                labelsDto,
+                Instant.now().toString()
+        );
 
-        assertThrows(IllegalArgumentException.class,
-                () -> mapper.toEvent(dto));
+        assertThrows(IllegalArgumentException.class, () -> mapper.toEvent(dto));
     }
 
 

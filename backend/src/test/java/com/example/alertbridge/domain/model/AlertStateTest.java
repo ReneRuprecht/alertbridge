@@ -59,9 +59,7 @@ public class AlertStateTest {
 
     @Test
     void shouldThrowIfEventFingerprintDoesNotMatch() {
-        AlertState state = AlertState.fromEvent(
-                TestFixtures.firingEvent("fp-1")
-        );
+        AlertState state = AlertState.fromEvent(TestFixtures.firingEvent("fp-1"));
 
         AlertEvent wrongEvent = new AlertEvent(
                 new AlertFingerprint("fp-2"),
@@ -70,8 +68,7 @@ public class AlertStateTest {
                 new AlertStartsAt(Instant.parse("2026-02-02T10:05:00Z"))
         );
 
-        assertThrows(IllegalArgumentException.class,
-                () -> state.apply(wrongEvent));
+        assertThrows(IllegalArgumentException.class, () -> state.apply(wrongEvent));
     }
 
 

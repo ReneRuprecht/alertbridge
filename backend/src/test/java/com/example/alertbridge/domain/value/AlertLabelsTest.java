@@ -8,7 +8,13 @@ class AlertLabelsTest {
 
     @Test
     void shouldSetDefaultsForOptionalLabels() {
-        AlertLabels labels = new AlertLabels(new AlertName("CPUHigh"), new AlertEnvironment(null), new AlertInstance(null), new AlertJob(null), AlertSeverity.fromString("critical"));
+        AlertLabels labels = new AlertLabels(
+                new AlertName("CPUHigh"),
+                new AlertEnvironment(null),
+                new AlertInstance(null),
+                new AlertJob(null),
+                AlertSeverity.fromString("critical")
+        );
 
         assertThat(labels.environment().value()).isEqualTo("unknown");
         assertThat(labels.instance().value()).isEqualTo("unknown");

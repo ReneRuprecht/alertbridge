@@ -9,18 +9,12 @@ public class AlertFingerprintTest {
 
     @Test
     void shouldThrowExceptionIfNull() {
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> new AlertFingerprint(null)
-        );
+        assertThrows(IllegalArgumentException.class, () -> new AlertFingerprint(null));
     }
 
     @Test
     void shouldThrowExceptionIfBlank() {
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> new AlertFingerprint("   ")
-        );
+        assertThrows(IllegalArgumentException.class, () -> new AlertFingerprint("   "));
     }
 
     @Test

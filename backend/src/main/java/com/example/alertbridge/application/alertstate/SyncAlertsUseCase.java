@@ -23,7 +23,8 @@ public class SyncAlertsUseCase {
 
     private void syncSingle(AlertEvent event) {
 
-        AlertState state = repository.findByFingerprint(event.fingerprint())
+        AlertState state = repository
+                .findByFingerprint(event.fingerprint())
                 .orElseGet(() -> AlertState.fromEvent(event));
 
         state.apply(event);
