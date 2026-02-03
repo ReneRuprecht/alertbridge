@@ -18,10 +18,10 @@ public class AlertStateTest {
     void shouldChangeStateFromFiringToResolved() {
 
         // given
-        AlertEvent firing = TestFixtures.firingEvent();
+        AlertEvent firing = TestFixtures.firingEvent("fp-1");
         AlertState state = AlertState.fromEvent(firing);
 
-        AlertEvent resolved = TestFixtures.resolvedEvent();
+        AlertEvent resolved = TestFixtures.resolvedEvent("fp-1");
 
         // when
         state.apply(resolved);
@@ -33,7 +33,7 @@ public class AlertStateTest {
 
     @Test
     void shouldKeepFingerprintImmutable() {
-        AlertEvent event = TestFixtures.firingEvent();
+        AlertEvent event = TestFixtures.firingEvent("fp-1");
         AlertState state = AlertState.fromEvent(event);
 
         assertThat(state.fingerprint()).isEqualTo(event.fingerprint());
@@ -60,7 +60,7 @@ public class AlertStateTest {
     @Test
     void shouldThrowIfEventFingerprintDoesNotMatch() {
         AlertState state = AlertState.fromEvent(
-                TestFixtures.firingEvent()
+                TestFixtures.firingEvent("fp-1")
         );
 
         AlertEvent wrongEvent = new AlertEvent(
@@ -77,8 +77,8 @@ public class AlertStateTest {
 
     @Test
     void isActiveShouldReturnTrueOnlyForFiring() {
-        AlertState firing = AlertState.fromEvent(TestFixtures.firingEvent());
-        AlertState resolved = AlertState.fromEvent(TestFixtures.resolvedEvent());
+        AlertState firing = AlertState.fromEvent(TestFixtures.firingEvent("fp-1"));
+        AlertState resolved = AlertState.fromEvent(TestFixtures.resolvedEvent("fp-1"));
 
         assertThat(firing.isActive()).isTrue();
         assertThat(resolved.isActive()).isFalse();

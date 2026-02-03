@@ -5,6 +5,7 @@ import com.example.alertbridge.api.alertmanager.dto.AlertLabelsDto;
 import com.example.alertbridge.api.alertmanager.dto.AlertSeverityDto;
 import com.example.alertbridge.api.alertmanager.dto.AlertStatusDto;
 import com.example.alertbridge.domain.event.AlertEvent;
+import com.example.alertbridge.domain.model.AlertState;
 import com.example.alertbridge.domain.value.*;
 
 import java.time.Instant;
@@ -29,18 +30,18 @@ public class TestFixtures {
         return new AlertStartsAt(instant);
     }
 
-    public static AlertEvent firingEvent() {
+    public static AlertEvent firingEvent(String fingerprint) {
         return new AlertEvent(
-                fingerprint("fp-1"),
+                fingerprint(fingerprint),
                 defaultLabels(),
                 AlertStatus.FIRING,
                 alertStartsAt(Instant.parse("2026-02-02T10:00:00Z"))
         );
     }
 
-    public static AlertEvent resolvedEvent() {
+    public static AlertEvent resolvedEvent(String fingerprint) {
         return new AlertEvent(
-                fingerprint("fp-1"),
+                fingerprint(fingerprint),
                 defaultLabels(),
                 AlertStatus.RESOLVED,
                 alertStartsAt(Instant.parse("2026-02-02T10:00:00Z"))
@@ -62,4 +63,13 @@ public class TestFixtures {
                 Instant.parse("2026-02-02T10:00:00Z").toString()
         );
     }
+
+    public static AlertState firingAlert(String fingerprint) {
+        return AlertState.fromEvent(firingEvent(fingerprint));
+    }
+
+    public static AlertState resolvedAlert(String fingerprint) {
+        return AlertState.fromEvent(resolvedEvent(fingerprint));
+    }
+
 }
