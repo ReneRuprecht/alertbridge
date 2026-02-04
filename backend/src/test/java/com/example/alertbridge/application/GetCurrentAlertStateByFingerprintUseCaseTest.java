@@ -1,4 +1,4 @@
-package com.example.alertbridge.aplication;
+package com.example.alertbridge.application;
 
 import com.example.alertbridge.application.alertstate.GetCurrentAlertStateByFingerprintUseCase;
 import com.example.alertbridge.domain.model.AlertState;
