@@ -4,7 +4,6 @@ import com.example.alertbridge.domain.model.AlertState;
 import com.example.alertbridge.domain.port.AlertStateRepository;
 import com.example.alertbridge.domain.value.AlertFingerprint;
 import com.example.alertbridge.infrastructure.redis.mapper.AlertStateRedisMapper;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -12,7 +11,6 @@ import java.util.Optional;
 import java.util.stream.StreamSupport;
 
 @Repository
-@Profile("dev")
 public class RedisAlertStateRepository implements AlertStateRepository {
     private final AlertStateRedisCrudRepository repository;
 

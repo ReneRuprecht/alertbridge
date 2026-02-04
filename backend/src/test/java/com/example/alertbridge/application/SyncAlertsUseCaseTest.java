@@ -3,6 +3,7 @@ package com.example.alertbridge.application;
 import com.example.alertbridge.application.alertstate.SyncAlertsUseCase;
 import com.example.alertbridge.domain.event.AlertEvent;
 import com.example.alertbridge.domain.model.AlertState;
+import com.example.alertbridge.domain.port.AlertHistoryRepository;
 import com.example.alertbridge.domain.port.AlertStateRepository;
 import com.example.alertbridge.domain.value.AlertFingerprint;
 import com.example.alertbridge.domain.value.AlertStatus;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 public class SyncAlertsUseCaseTest {
 
@@ -23,7 +25,8 @@ public class SyncAlertsUseCaseTest {
     @BeforeEach
     void setUp() {
         repository = new InMemoryAlertStateRepository();
-        useCase = new SyncAlertsUseCase(repository);
+        AlertHistoryRepository historyRepository = mock(AlertHistoryRepository.class);
+        useCase = new SyncAlertsUseCase(repository, historyRepository);
     }
 
     @Test

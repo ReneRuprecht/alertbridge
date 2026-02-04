@@ -9,3 +9,18 @@ services:
       interval: 10s
       timeout: 10s
       retries: 10
+
+  postgres:
+    container_name: postgres
+    image: postgres:18-alpine
+    ports:
+        - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: alerts
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d alerts"]
+      interval: 10s
+      timeout: 10s
+      retries: 10

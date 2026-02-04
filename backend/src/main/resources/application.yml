@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: "alertbridge"
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:5432/alerts
+    username: ${POSTGRES_USER:root}
+    password: ${POSTGRES_PASS:root}
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
