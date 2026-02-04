@@ -35,7 +35,9 @@ public class SyncAlertsUseCaseTest {
         useCase.execute(List.of(firing));
         useCase.execute(List.of(resolved));
 
-        AlertState state = this.repository.findByFingerprint(new AlertFingerprint("fp-1")).orElseThrow();
+        AlertState state = this.repository
+                .findByFingerprint(new AlertFingerprint("fp-1"))
+                .orElseThrow();
 
         assertThat(state.status()).isEqualTo(AlertStatus.RESOLVED);
     }
