@@ -1,8 +1,8 @@
 spring:
   datasource:
     url: "jdbc:postgresql://localhost:5432/alerts"
-    username: "alerts"
-    password: "alerts"
+    username: "${POSTGRES_USER:alerts}"
+    password: "${POSTGRES_PASSWORD:alerts}"
     hikari:
       connection-timeout: 250
   jpa:
