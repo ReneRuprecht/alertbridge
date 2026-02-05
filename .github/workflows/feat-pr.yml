@@ -1,0 +1,23 @@
+name: Feat Pr Branch
+
+on:
+  pull_request:
+    paths-ignore:
+      - .github/workflows/**
+      - 'README.md'
+    branches:
+      - main
+      - dev
+  push:
+    paths-ignore:
+      - .github/workflows/**
+      - 'README.md'
+    branches-ignore:
+      - main
+      - dev
+
+jobs:
+  backend-tests:
+    uses: ./.github/workflows/backend-tests.yml
+    with:
+      run_integration_tests: false
