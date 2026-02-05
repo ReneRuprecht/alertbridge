@@ -1,0 +1,17 @@
+name: Feat Pr Branch
+
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+  push:
+    branches-ignore:
+      - main
+      - dev
+
+jobs:
+  backend-tests:
+    uses: ./.github/workflows/backend-tests.yml
+    with:
+      run_integration_tests: false

@@ -1,0 +1,16 @@
+name: Main Branch
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  backend-tests:
+    uses: ./.github/workflows/backend-tests.yml
+    with:
+      branch: main
+      run_integration_tests: true
+      upload_plan: true
+    secrets:
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
