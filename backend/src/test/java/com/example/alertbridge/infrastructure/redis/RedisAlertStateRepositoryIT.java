@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.redis.test.autoconfigure.DataRedisTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -20,7 +22,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class RedisAlertStateRepositoryIT {
 
     @Container
-    static RedisContainer redis = new RedisContainer("redis:8.2.3-alpine").withExposedPorts(6379);
+    static RedisContainer redis = new RedisContainer("redis:8.2.3-alpine");
+
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        String redisHost = redis.getHost();
+        Integer redisPort = redis.getFirstMappedPort();
+        System.setProperty("spring.data.redis.host", redisHost);
+        System.setProperty("spring.data.redis.port", redisPort.toString());
+    }
 
     @Autowired
     RedisAlertStateRepository repository;
