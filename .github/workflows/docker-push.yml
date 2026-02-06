@@ -1,0 +1,69 @@
+name: Docker Push
+
+on:
+  workflow_call:
+    inputs:
+      name:
+        description: "Name of the image"
+        required: true
+        type: string
+      dockerfile:
+        description: "Path of the dockerfile"
+        required: true
+        type: string
+      push_latest:
+        required: false
+        type: boolean
+        default: false
+    secrets:
+      DOCKER_USERNAME:
+        required: false
+      DOCKER_TOKEN:
+        required: false
+
+jobs:
+  build:
+    uses: ./.github/workflows/docker-build.yml
+    with:
+      name: ${{ inputs.name }}
+      dockerfile: ${{ inputs.dockerfile }}
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+
+  push:
+    needs: build
+    container:
+      image:  "docker:28.3.3-dind-alpine3.22"
+    runs-on: self-hosted
+    steps:
+      - name: Login
+        if: github.ref == 'refs/heads/main' 
+        run: |
+          set -euo pipefail
+
+          echo "${{ secrets.DOCKER_TOKEN }}" | docker login docker.io \
+            -u "${{ secrets.DOCKER_USERNAME}}" \
+            --password-stdin
+
+      - name: Push Tag
+        if: github.ref == 'refs/heads/main' 
+        run: |
+          set -euo pipefail
+
+          USER="${{ secrets.DOCKER_USERNAME }}"
+          IMAGE="${{ needs.build.outputs.image }}"
+          TAG="${{ needs.build.outputs.tag }}"
+
+          docker image push "${USER}/${IMAGE}:${TAG}"
+          echo "## PUSHED ${IMAGE}:${TAG}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Push latest
+        if: github.ref == 'refs/heads/main' && inputs.push_latest
+        run: |
+          set -euo pipefail
+
+          USER="${{ secrets.DOCKER_USERNAME }}"
+          IMAGE="${{ needs.build.outputs.image }}"
+
+          docker image push "${USER}/${IMAGE}:latest"
+          echo "## PUSHED ${IMAGE}:latest" >> $GITHUB_STEP_SUMMARY

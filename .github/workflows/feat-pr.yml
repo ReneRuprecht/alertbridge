@@ -21,3 +21,10 @@ jobs:
     uses: ./.github/workflows/backend-tests.yml
     with:
       run_integration_tests: false
+  docker-build:
+    uses: ./.github/workflows/docker-build.yml
+    with:
+      name: "alertbridge-backend"
+      dockerfile: "docker/backend/Dockerfile"
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}

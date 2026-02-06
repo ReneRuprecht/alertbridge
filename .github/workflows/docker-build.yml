@@ -1,0 +1,50 @@
+name: Docker Build
+
+on:
+  workflow_call:
+    inputs:
+      name:
+        required: true
+        type: string
+      dockerfile:
+        required: true
+        type: string
+    secrets:
+      DOCKER_USERNAME:
+        required: true
+    outputs:
+      image:
+        value: ${{ jobs.build.outputs.image }}
+        description: "Image name"
+      tag:
+        value: ${{ jobs.build.outputs.tag }}
+        description: "Image tag"
+
+jobs:
+  build:
+    container:
+      image:  "docker:28.3.3-dind-alpine3.22"
+    runs-on: self-hosted
+    outputs:
+      image: ${{ steps.build.outputs.image }}
+      tag: ${{ steps.build.outputs.tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build
+        id: build
+        run: |
+          USER="${{ secrets.DOCKER_USERNAME }}"
+          IMAGE="${{ inputs.name }}"
+          TAG="${GITHUB_SHA::7}"
+
+          echo "Building image: $IMAGE"
+          docker build \
+            -t "${USER}/${IMAGE}:latest" \
+            -t "${USER}/${IMAGE}:${TAG}" \
+            -f "${{ inputs.dockerfile }}" \
+            .
+
+          echo "image=$IMAGE">> $GITHUB_OUTPUT
+          echo "tag=$TAG">> $GITHUB_OUTPUT
