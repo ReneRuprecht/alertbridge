@@ -1,5 +1,5 @@
 
-.PHONY: up down clean backend
+.PHONY: up down clean backend frontend
 
 up:
 	docker-compose up -d postgres redis
@@ -20,6 +20,9 @@ backend:
 		elapsed=$$((elapsed+2)); \
 	done
 	@echo "Backend is ready"
+
+frontend:
+	docker-compose up -d frontend
 
 down:
 	docker-compose down
