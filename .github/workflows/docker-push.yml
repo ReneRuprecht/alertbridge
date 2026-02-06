@@ -15,6 +15,10 @@ on:
         required: false
         type: boolean
         default: false
+      push_tag:
+        required: false
+        type: boolean
+        default: false
     secrets:
       DOCKER_USERNAME:
         required: false
@@ -46,7 +50,7 @@ jobs:
             --password-stdin
 
       - name: Push Tag
-        if: github.ref == 'refs/heads/main' 
+        if: github.ref == 'refs/heads/main' && inputs.push_tag
         run: |
           set -euo pipefail
 

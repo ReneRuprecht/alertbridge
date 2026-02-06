@@ -40,6 +40,7 @@ jobs:
       name: "alertbridge-backend"
       dockerfile: "docker/backend/Dockerfile"
       push_latest: true
+      push_tag: false
     secrets:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}

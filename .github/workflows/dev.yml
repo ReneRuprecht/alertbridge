@@ -33,11 +33,11 @@ jobs:
       upload_plan: true
     secrets:
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
-  docker-build:
-    needs: backend-tests
-    uses: ./.github/workflows/docker-build.yml
-    with:
-      name: "alertbridge-backend"
-      dockerfile: "docker/backend/Dockerfile"
-    secrets:
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  # docker-build:
+  #   needs: backend-tests
+  #   uses: ./.github/workflows/docker-build.yml
+  #   with:
+  #     name: "alertbridge-backend"
+  #     dockerfile: "docker/backend/Dockerfile"
+  #   secrets:
+  #     DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
