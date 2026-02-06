@@ -1,12 +1,13 @@
-name: Main Branch
+name: Feat Branch
 
 on:
   push:
     paths-ignore:
       - .github/workflows/**
       - 'README.md'
-    branches:
+    branches-ignore:
       - main
+      - dev
 
 jobs:
   changes:
@@ -17,10 +18,12 @@ jobs:
       backend: ${{ steps.filter.outputs.backend }}
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 20
     - uses: dorny/paths-filter@v3
       id: filter
       with:
-        base: ${{ github.ref }}
+        base: dev
         filters: |
           backend:
             - 'backend/**'
@@ -29,17 +32,12 @@ jobs:
     if: "${{ needs.changes.outputs.backend == 'true' }}"
     uses: ./.github/workflows/backend-tests.yml
     with:
-      run_integration_tests: true
-      upload_plan: true
-    secrets:
-      SECRET_KEY: ${{ secrets.SECRET_KEY }}
-  docker-push:
+      run_integration_tests: false
+  docker-build:
     needs: backend-tests
-    uses: ./.github/workflows/docker-push.yml
+    uses: ./.github/workflows/docker-build.yml
     with:
       name: "alertbridge-backend"
       dockerfile: "docker/backend/Dockerfile"
-      push_latest: true
     secrets:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
