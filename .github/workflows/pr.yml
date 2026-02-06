@@ -1,4 +1,4 @@
-name: Feat Pr Branch
+name: Pull Request
 
 on:
   pull_request:
@@ -8,16 +8,27 @@ on:
     branches:
       - main
       - dev
-  push:
-    paths-ignore:
-      - .github/workflows/**
-      - 'README.md'
-    branches-ignore:
-      - main
-      - dev
 
 jobs:
+  changes:
+    runs-on: self-hosted
+    container:
+      image: reneruprecht/ci-node22
+    permissions:
+      pull-requests: read
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dorny/paths-filter@v3
+      id: filter
+      with:
+        filters: |
+          backend:
+            - 'backend/**'
   backend-tests:
+    needs: changes
+    if: "${{ needs.changes.outputs.backend == 'true' }}"
     uses: ./.github/workflows/backend-tests.yml
     with:
       run_integration_tests: false

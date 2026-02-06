@@ -9,7 +9,24 @@ on:
       - dev
 
 jobs:
+  changes:
+    runs-on: self-hosted
+    container:
+      image: reneruprecht/ci-node22
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dorny/paths-filter@v3
+      id: filter
+      with:
+        base: ${{ github.ref }}
+        filters: |
+          backend:
+            - 'backend/**'
   backend-tests:
+    needs: changes
+    if: "${{ needs.changes.outputs.backend == 'true' }}"
     uses: ./.github/workflows/backend-tests.yml
     with:
       run_integration_tests: true
