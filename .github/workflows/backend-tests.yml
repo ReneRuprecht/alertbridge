@@ -41,6 +41,7 @@ jobs:
 
       - name: Integration tests
         id: integration-test
+        if: inputs.run_integration_tests
         working-directory: ./backend
         run: |
           ./mvnw -B -ntp -DtrimStackTrace=false failsafe:integration-test failsafe:verify
