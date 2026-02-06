@@ -7,10 +7,7 @@ import com.example.alertbridge.application.alertstate.GetCurrentAlertStatesUseCa
 import com.example.alertbridge.domain.model.AlertState;
 import com.example.alertbridge.domain.value.AlertFingerprint;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,11 +28,13 @@ public class CurrentAlertController {
     }
 
     @GetMapping
+    @CrossOrigin
     public List<AlertViewDto> getCurrentAlerts() {
         return this.getCurrentAlertStatesUseCase.execute().stream().map(mapper::toDto).toList();
     }
 
     @GetMapping("/{fingerprint}")
+    @CrossOrigin
     public ResponseEntity<AlertViewDto> getAlert(@PathVariable String fingerprint) {
         AlertFingerprint fp = new AlertFingerprint(fingerprint);
 
