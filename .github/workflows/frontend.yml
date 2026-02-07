@@ -1,0 +1,57 @@
+name: Frontend
+
+on:
+  workflow_call:
+    inputs:
+      build:
+        description: "Build docker image"
+        required: false
+        type: boolean
+        default: false
+      push:
+        description: "Push docker image"
+        required: false
+        type: boolean
+        default: false
+      push_latest:
+        description: "Push latest docker image"
+        required: false
+        type: boolean
+        default: true
+      push_tag:
+        description: "Push docker image with SHA Tag"
+        required: false
+        type: boolean
+        default: false
+    secrets:
+      DOCKER_USERNAME:
+        required: false
+      DOCKER_TOKEN:
+        required: false
+      VITE_API_BASE_URL:
+        required: true
+
+jobs:
+  docker-build:
+    if: inputs.build || inputs.push
+    uses: ./.github/workflows/docker-build.yml
+    with:
+      name: "alertbridge-frontend"
+      dockerfile: "docker/frontend/Dockerfile.prod"
+      prepare_frontend: true
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+
+  docker-push:
+    needs: docker-build
+    if: inputs.push
+    uses: ./.github/workflows/docker-push.yml
+    with:
+      image: ${{ needs.docker-build.outputs.image }}
+      tag: ${{ needs.docker-build.outputs.tag }}
+      push_latest: ${{ inputs.push_latest }}
+      push_tag: ${{ inputs.push_tag }}
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}

@@ -24,6 +24,8 @@ jobs:
         filters: |
           backend:
             - 'backend/**'
+          frontend:
+            - 'frontend/**'
   backend:
     needs: changes
     if: "${{ needs.changes.outputs.backend == 'true' }}"
@@ -35,3 +37,14 @@ jobs:
       DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
     permissions:
       checks: write
+
+  frontend:
+    needs: changes
+    if: "${{ needs.changes.outputs.frontend == 'true' }}"
+    uses: ./.github/workflows/frontend.yml
+    with:
+      push: true
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+      VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}

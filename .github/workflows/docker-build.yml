@@ -10,9 +10,15 @@ on:
       dockerfile:
         required: true
         type: string
+      prepare_frontend:
+        required: false
+        type: boolean
+        default: false
     secrets:
       DOCKER_USERNAME:
         required: true
+      VITE_API_BASE_URL:
+        required: false
     outputs:
       image:
         value: ${{ jobs.build.outputs.image }}
@@ -32,6 +38,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Build
+        if: inputs.prepare_frontend
+        run: |
+          echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" >> frontend/.env
 
       - name: Build
         id: build
