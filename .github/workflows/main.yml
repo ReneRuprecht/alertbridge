@@ -28,7 +28,7 @@ jobs:
             - 'frontend/**'
   backend:
     needs: changes
-    if: "${{ needs.changes.outputs.backend == 'true' }}"
+    if: needs.changes.outputs.backend == 'true' 
     uses: ./.github/workflows/backend.yml
     with:
       push: true
@@ -40,7 +40,7 @@ jobs:
 
   frontend:
     needs: changes
-    if: "${{ needs.changes.outputs.frontend == 'true' }}"
+    if: needs.changes.outputs.frontend == 'true'
     uses: ./.github/workflows/frontend.yml
     with:
       push: true
