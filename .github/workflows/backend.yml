@@ -1,4 +1,4 @@
-name: Backend Tests
+name: Backend
 
 on:
   workflow_call:
@@ -7,16 +7,41 @@ on:
         required: false
         type: boolean
         default: true
-      upload_plan:
+      upload_reports:
+        description: "Upload test reports"
+        required: false
+        type: boolean
+        default: false
+      build:
+        description: "Build docker image"
+        required: false
+        type: boolean
+        default: false
+      push:
+        description: "Push docker image"
+        required: false
+        type: boolean
+        default: false
+      push_latest:
+        description: "Push latest docker image"
+        required: false
+        type: boolean
+        default: true
+      push_tag:
+        description: "Push docker image with SHA Tag"
         required: false
         type: boolean
         default: false
     secrets:
       SECRET_KEY:
         required: false
+      DOCKER_USERNAME:
+        required: false
+      DOCKER_TOKEN:
+        required: false
 
 jobs:
-  backend-test:
+  test:
     runs-on: self-hosted
     defaults:
       run:
@@ -48,7 +73,7 @@ jobs:
 
       - name: Compress test reports
         id: compression
-        if: steps.unit-test.outcome == 'success' && inputs.upload_plan == true
+        if: steps.unit-test.outcome == 'success' && inputs.upload_reports == true
         working-directory: ./backend
         run: |
           REPORTS=""
@@ -63,14 +88,37 @@ jobs:
 
       - name: Encrypt test reports
         id: encryption
-        if: steps.compression.outcome == 'success' && inputs.upload_plan == true
+        if: steps.compression.outcome == 'success' && inputs.upload_reports == true
         working-directory: ./backend
         run: |
           openssl enc -aes-256-cbc -salt -pbkdf2 -k "${{ secrets.SECRET_KEY }}" -in "test-reports.tar.gz" -out "test-reports.tar.gz.enc"
 
       - name: Upload encrypted test-reports
-        if: steps.encryption.outcome == 'success' && inputs.upload_plan == true
+        if: steps.encryption.outcome == 'success' && inputs.upload_reports == true
         uses: actions/upload-artifact@v6
         with:
           name: "test-reports"
           path: "backend/test-reports.tar.gz.enc"
+
+  docker-build:
+    needs: test
+    if: inputs.build || inputs.push
+    uses: ./.github/workflows/docker-build.yml
+    with:
+      name: "alertbridge-backend"
+      dockerfile: "docker/backend/Dockerfile"
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+
+  docker-push:
+    needs: docker-build
+    if: inputs.push
+    uses: ./.github/workflows/docker-push.yml
+    with:
+      image: ${{ needs.docker-build.outputs.image }}
+      tag: ${{ needs.docker-build.outputs.tag }}
+      push_latest: ${{ inputs.push_latest }}
+      push_tag: ${{ inputs.push_tag }}
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}

@@ -26,17 +26,11 @@ jobs:
         filters: |
           backend:
             - 'backend/**'
-  backend-tests:
+  backend:
     needs: changes
     if: "${{ needs.changes.outputs.backend == 'true' }}"
-    uses: ./.github/workflows/backend-tests.yml
+    uses: ./.github/workflows/backend.yml
     with:
-      run_integration_tests: false
-  docker-build:
-    needs: backend-tests
-    uses: ./.github/workflows/docker-build.yml
-    with:
-      name: "alertbridge-backend"
-      dockerfile: "docker/backend/Dockerfile"
+      run_integration_tests: true
     secrets:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}

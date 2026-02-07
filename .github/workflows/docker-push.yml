@@ -3,18 +3,18 @@ name: Docker Push
 on:
   workflow_call:
     inputs:
-      name:
+      image:
         description: "Name of the image"
         required: true
         type: string
-      dockerfile:
-        description: "Path of the dockerfile"
-        required: true
+      tag:
+        description: "Tag of the image"
+        required: false
         type: string
       push_latest:
         required: false
         type: boolean
-        default: false
+        default: true
       push_tag:
         required: false
         type: boolean
@@ -26,22 +26,13 @@ on:
         required: false
 
 jobs:
-  build:
-    uses: ./.github/workflows/docker-build.yml
-    with:
-      name: ${{ inputs.name }}
-      dockerfile: ${{ inputs.dockerfile }}
-    secrets:
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-
   push:
-    needs: build
     container:
       image:  "docker:28.3.3-dind-alpine3.22"
     runs-on: self-hosted
     steps:
       - name: Login
-        if: github.ref == 'refs/heads/main' 
+        # if: github.ref == 'refs/heads/main' 
         run: |
           set -euo pipefail
 
@@ -50,24 +41,26 @@ jobs:
             --password-stdin
 
       - name: Push Tag
-        if: github.ref == 'refs/heads/main' && inputs.push_tag
+        # if: github.ref == 'refs/heads/main' && inputs.push_tag
         run: |
           set -euo pipefail
 
           USER="${{ secrets.DOCKER_USERNAME }}"
-          IMAGE="${{ needs.build.outputs.image }}"
-          TAG="${{ needs.build.outputs.tag }}"
+          IMAGE="${{ inputs.image }}"
+          TAG="${{ inputs.tag }}"
 
-          docker image push "${USER}/${IMAGE}:${TAG}"
-          echo "## PUSHED ${IMAGE}:${TAG}" >> $GITHUB_STEP_SUMMARY
+          #docker image push "${USER}/${IMAGE}:${TAG}"
+          # echo "## PUSHED ${IMAGE}:${TAG}" >> $GITHUB_STEP_SUMMARY
+          echo "PUSH TAG ${IMAGE}:${TAG}"
 
       - name: Push latest
-        if: github.ref == 'refs/heads/main' && inputs.push_latest
+        # if: github.ref == 'refs/heads/main' && inputs.push_latest
         run: |
           set -euo pipefail
 
           USER="${{ secrets.DOCKER_USERNAME }}"
-          IMAGE="${{ needs.build.outputs.image }}"
+          IMAGE="${{ inputs.image }}"
 
-          docker image push "${USER}/${IMAGE}:latest"
-          echo "## PUSHED ${IMAGE}:latest" >> $GITHUB_STEP_SUMMARY
+          # docker image push "${USER}/${IMAGE}:latest"
+          # echo "## PUSHED ${IMAGE}:latest" >> $GITHUB_STEP_SUMMARY
+          echo "PUSH latest ${IMAGE}"
