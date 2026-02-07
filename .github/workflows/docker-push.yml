@@ -32,7 +32,7 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Login
-        # if: github.ref == 'refs/heads/main' 
+        if: github.ref == 'refs/heads/main' 
         run: |
           set -euo pipefail
 
@@ -41,7 +41,7 @@ jobs:
             --password-stdin
 
       - name: Push Tag
-        # if: github.ref == 'refs/heads/main' && inputs.push_tag
+        if: github.ref == 'refs/heads/main' && inputs.push_tag
         run: |
           set -euo pipefail
 
@@ -49,18 +49,16 @@ jobs:
           IMAGE="${{ inputs.image }}"
           TAG="${{ inputs.tag }}"
 
-          #docker image push "${USER}/${IMAGE}:${TAG}"
-          # echo "## PUSHED ${IMAGE}:${TAG}" >> $GITHUB_STEP_SUMMARY
-          echo "PUSH TAG ${IMAGE}:${TAG}"
+          docker image push "${USER}/${IMAGE}:${TAG}"
+          echo "## PUSHED ${IMAGE}:${TAG}" >> $GITHUB_STEP_SUMMARY
 
       - name: Push latest
-        # if: github.ref == 'refs/heads/main' && inputs.push_latest
+        if: github.ref == 'refs/heads/main' && inputs.push_latest
         run: |
           set -euo pipefail
 
           USER="${{ secrets.DOCKER_USERNAME }}"
           IMAGE="${{ inputs.image }}"
 
-          # docker image push "${USER}/${IMAGE}:latest"
-          # echo "## PUSHED ${IMAGE}:latest" >> $GITHUB_STEP_SUMMARY
-          echo "PUSH latest ${IMAGE}"
+          docker image push "${USER}/${IMAGE}:latest"
+          echo "## PUSHED ${IMAGE}:latest" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,23 @@
+name: Backend Unit Test
+
+on:
+  workflow_call:
+
+jobs:
+  unit:
+    runs-on: self-hosted
+    defaults:
+      run:
+        shell: bash
+    container:
+      image: reneruprecht/ci-java21jdk
+      volumes:
+        - /opt/gha-cache/m2:/root/.m2
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Unit tests
+        working-directory: ./backend
+        run: |
+          ./mvnw -B -ntp -DtrimStackTrace=false test
