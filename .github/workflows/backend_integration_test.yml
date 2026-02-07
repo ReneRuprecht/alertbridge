@@ -17,7 +17,19 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Clean
+        working-directory: ./backend
+        run: |
+          ./mvnw clean verify -DskipTests
+
       - name: Integration tests
         working-directory: ./backend
         run: |
           ./mvnw -B -ntp -DtrimStackTrace=false failsafe:integration-test failsafe:verify
+
+      - name: Integration test report
+        uses: mikepenz/action-junit-report@v4
+        if: always()
+        with:
+          report_paths: backend/target/failsafe-reports/*.xml
+          check_name: Integration Tests

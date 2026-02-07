@@ -32,6 +32,8 @@ jobs:
     if: "${{ needs.changes.outputs.backend == 'true' }}"
     uses: ./.github/workflows/backend.yml
     with:
-      run_integration_tests: false
+      run_integration_tests: true
     secrets:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+    permissions:
+      checks: write
