@@ -15,6 +15,7 @@ jobs:
       image: reneruprecht/ci-node22
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
     steps:
     - uses: actions/checkout@v4
     - uses: dorny/paths-filter@v3
