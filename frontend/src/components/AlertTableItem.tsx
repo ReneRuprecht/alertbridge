@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
 import type { AlertState } from "../types/Alert";
-import { formatAlertInstance, formatAlertStartsAt } from "../utils/formatter";
+import { formatAlertInstance } from "../utils/formatter";
 
 interface AlertItemProps {
   alert: AlertState;
@@ -17,7 +17,7 @@ export default function AlertTableItem({ alert }: AlertItemProps) {
       <td>{formatAlertInstance(alert.instance)}</td>
       <td>{alert.job}</td>
       <td>{alert.severity}</td>
-      <td>{formatAlertStartsAt(alert.startsAt)}</td>
+      <td>{formatAlertInstance(alert.startsAt)}</td>
       <td>{alert.status}</td>
       <td></td>
     </tr>

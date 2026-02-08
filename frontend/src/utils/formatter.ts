@@ -5,7 +5,7 @@ export function formatAlertInstance(instance: string | undefined): string {
   return instance.split(":")[0];
 }
 
-export function formatAlertStartsAt(startsAt: string | undefined): string {
+export function formatAlertTime(startsAt: string | undefined): string {
   if (startsAt === undefined) return "";
   if (startsAt.trim() === "") return "";
 

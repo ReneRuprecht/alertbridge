@@ -21,4 +21,5 @@ export interface AlertEvent {
   severity: "CRITICAL" | "WARNING" | "INFO" | string;
   status: "Firing" | "Resolved" | string;
   startsAt: string;
+  receivedAt: string;
 }
