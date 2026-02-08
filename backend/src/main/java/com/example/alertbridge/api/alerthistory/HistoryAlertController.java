@@ -6,10 +6,7 @@ import com.example.alertbridge.application.alertstate.GetAlertHistoryByInstanceU
 import com.example.alertbridge.domain.event.AlertEvent;
 import com.example.alertbridge.domain.value.AlertInstance;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -26,6 +23,7 @@ public class HistoryAlertController {
     }
 
     @GetMapping("/{instance}")
+    @CrossOrigin
     public ResponseEntity<AlertHistoryViewDto> getAlertHistory(@PathVariable String instance) {
         AlertInstance in = new AlertInstance(instance);
 
