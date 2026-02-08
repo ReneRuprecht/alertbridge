@@ -17,8 +17,9 @@ public class AlertApiMapper {
         AlertStatus status = mapStatus(dto.status().toString());
         AlertLabels labels = toAlertLabels(dto.labels());
         AlertStartsAt startsAt = new AlertStartsAt(Instant.parse(dto.startsAt()));
+        AlertReceivedAt receivedAt = new AlertReceivedAt(Instant.now());
 
-        return new AlertEvent(fingerprint, labels, status, startsAt);
+        return new AlertEvent(fingerprint, labels, status, startsAt, receivedAt);
     }
 
     private AlertLabels toAlertLabels(AlertLabelsDto dto) {

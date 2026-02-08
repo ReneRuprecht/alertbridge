@@ -2,6 +2,7 @@ package com.example.alertbridge.domain.model;
 
 import com.example.alertbridge.domain.event.AlertEvent;
 import com.example.alertbridge.domain.value.AlertFingerprint;
+import com.example.alertbridge.domain.value.AlertReceivedAt;
 import com.example.alertbridge.domain.value.AlertStartsAt;
 import com.example.alertbridge.domain.value.AlertStatus;
 import fixtures.TestFixtures;
@@ -45,7 +46,8 @@ public class AlertStateTest {
                 new AlertFingerprint("fp-1"),
                 TestFixtures.defaultLabels(),
                 AlertStatus.FIRING,
-                new AlertStartsAt(Instant.parse("2026-02-02T10:00:00Z"))
+                new AlertStartsAt(Instant.parse("2026-02-02T10:00:00Z")),
+                new AlertReceivedAt(Instant.parse("2026-02-02T11:00:00Z"))
         );
 
         AlertState state = AlertState.fromEvent(event);
@@ -65,7 +67,8 @@ public class AlertStateTest {
                 new AlertFingerprint("fp-2"),
                 TestFixtures.defaultLabels(),
                 AlertStatus.RESOLVED,
-                new AlertStartsAt(Instant.parse("2026-02-02T10:05:00Z"))
+                new AlertStartsAt(Instant.parse("2026-02-02T10:05:00Z")),
+                new AlertReceivedAt(Instant.parse("2026-02-02T11:00:00Z"))
         );
 
         assertThrows(IllegalArgumentException.class, () -> state.apply(wrongEvent));

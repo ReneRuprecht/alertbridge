@@ -25,6 +25,9 @@ public class AlertHistoryEntity {
     @Column(name = "starts_at")
     private Instant startsAt;
 
+    @Column(name = "received_at")
+    private Instant receivedAt;
+
     @Column(name = "alert_name")
     private String alertName;
     private String instance;
@@ -102,6 +105,14 @@ public class AlertHistoryEntity {
 
     public void setAlertHash(String alertHash) {
         this.alertHash = alertHash;
+    }
+
+    public Instant getReceivedAt() {
+        return receivedAt;
+    }
+
+    public void setReceivedAt(Instant receivedAt) {
+        this.receivedAt = receivedAt;
     }
 
 }

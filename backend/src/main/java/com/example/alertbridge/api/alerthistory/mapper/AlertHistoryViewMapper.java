@@ -16,7 +16,8 @@ public class AlertHistoryViewMapper {
                 event.labels().job().value(),
                 event.labels().severity().name(),
                 event.status().name(),
-                event.startsAt().value()
+                event.startsAt().value(),
+                event.receivedAt().value()
         );
     }
 

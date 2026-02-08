@@ -26,7 +26,7 @@ public class PostgresAlertHistoryRepository implements AlertHistoryRepository {
     @Override
     public List<AlertEvent> findByAlertInstance(AlertInstance instance) {
         return this.repository
-                .findByInstanceContaining(instance.value())
+                .findByInstanceContainingOrderByReceivedAtDesc(instance.value())
                 .stream()
                 .map(AlertHistoryMapper::toDomain)
                 .toList();

@@ -9,7 +9,7 @@ import java.util.UUID;
 @Repository
 public interface JpaAlertHistoryRepository extends JpaRepository<AlertHistoryEntity, UUID> {
 
-    List<AlertHistoryEntity> findByInstanceContaining(String instance);
+    List<AlertHistoryEntity> findByInstanceContainingOrderByReceivedAtDesc(String instance);
 
     boolean existsByAlertHash(
             String alertHash

@@ -19,6 +19,7 @@ public class AlertHistoryMapper {
         entity.setJob(state.labels().job().value());
         entity.setEnvironment(state.labels().environment().value());
         entity.setAlertHash(computeHash(state));
+        entity.setReceivedAt(state.receivedAt().value());
         return entity;
     }
 
@@ -32,13 +33,17 @@ public class AlertHistoryMapper {
 
     public static AlertEvent toDomain(AlertHistoryEntity entity) {
         return new AlertEvent(
-                new AlertFingerprint(entity.getFingerprint()), new AlertLabels(
-                new AlertName(entity.getAlertName()),
-                new AlertEnvironment(entity.getEnvironment()),
-                new AlertInstance(entity.getInstance()),
-                new AlertJob(entity.getJob()),
-                AlertSeverity.fromString(entity.getSeverity())
-        ), entity.getStatus(), new AlertStartsAt(entity.getStartsAt())
+                new AlertFingerprint(entity.getFingerprint()),
+                new AlertLabels(
+                        new AlertName(entity.getAlertName()),
+                        new AlertEnvironment(entity.getEnvironment()),
+                        new AlertInstance(entity.getInstance()),
+                        new AlertJob(entity.getJob()),
+                        AlertSeverity.fromString(entity.getSeverity())
+                ),
+                entity.getStatus(),
+                new AlertStartsAt(entity.getStartsAt()),
+                new AlertReceivedAt(entity.getReceivedAt())
         );
     }
 }

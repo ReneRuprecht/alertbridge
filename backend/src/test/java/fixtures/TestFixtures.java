@@ -36,8 +36,13 @@ public class TestFixtures {
         );
     }
 
+
     public static AlertStartsAt alertStartsAt(Instant instant) {
         return new AlertStartsAt(instant);
+    }
+
+    public static AlertReceivedAt alertReceivedAt(Instant instant) {
+        return new AlertReceivedAt(instant);
     }
 
     public static AlertEvent firingEvent(String fingerprint) {
@@ -45,7 +50,8 @@ public class TestFixtures {
                 fingerprint(fingerprint),
                 defaultLabels(),
                 AlertStatus.FIRING,
-                alertStartsAt(Instant.parse("2026-02-02T10:00:00Z"))
+                alertStartsAt(Instant.parse("2026-02-02T10:00:00Z")),
+                alertReceivedAt(Instant.parse("2026-02-02T11:00:00Z"))
         );
     }
 
@@ -54,7 +60,8 @@ public class TestFixtures {
                 fingerprint(fingerprint),
                 defaultLabels(),
                 AlertStatus.RESOLVED,
-                alertStartsAt(Instant.parse("2026-02-02T10:00:00Z"))
+                alertStartsAt(Instant.parse("2026-02-02T10:00:00Z")),
+                alertReceivedAt(Instant.parse("2026-02-02T11:00:00Z"))
         );
     }
 
@@ -63,7 +70,8 @@ public class TestFixtures {
                 fingerprint(fingerprint),
                 defaultLabels(instance),
                 AlertStatus.FIRING,
-                alertStartsAt(Instant.parse("2026-02-02T10:00:00Z"))
+                alertStartsAt(Instant.parse("2026-02-02T10:00:00Z")),
+                alertReceivedAt(Instant.parse("2026-02-02T11:00:00Z"))
         );
     }
 
@@ -72,7 +80,8 @@ public class TestFixtures {
                 fingerprint(fingerprint),
                 defaultLabels(instance),
                 AlertStatus.RESOLVED,
-                alertStartsAt(Instant.parse("2026-02-02T10:00:00Z"))
+                alertStartsAt(Instant.parse("2026-02-02T10:00:00Z")),
+                alertReceivedAt(Instant.parse("2026-02-02T11:00:00Z"))
         );
     }
 

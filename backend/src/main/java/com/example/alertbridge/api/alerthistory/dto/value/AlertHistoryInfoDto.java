@@ -7,5 +7,7 @@ public record AlertHistoryInfoDto(
         String job,
         String severity,
         String status,
-        Instant startsAt) {
+        Instant startsAt,
+        Instant receivedAt
+) {
 }
