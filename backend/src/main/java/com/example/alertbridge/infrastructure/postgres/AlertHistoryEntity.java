@@ -7,20 +7,25 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "alert_history")
+@Table(name = "alert_history", uniqueConstraints = @UniqueConstraint(columnNames = "alert_hash"))
 public class AlertHistoryEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+    @Column(name = "alert_hash")
+    private String alertHash;
+
     private String fingerprint;
 
     @Enumerated(EnumType.STRING)
     private AlertStatus status;
 
+    @Column(name = "starts_at")
     private Instant startsAt;
 
+    @Column(name = "alert_name")
     private String alertName;
     private String instance;
     private String severity;
@@ -90,4 +95,13 @@ public class AlertHistoryEntity {
     public void setEnvironment(String environment) {
         this.environment = environment;
     }
+
+    public String getAlertHash() {
+        return alertHash;
+    }
+
+    public void setAlertHash(String alertHash) {
+        this.alertHash = alertHash;
+    }
+
 }

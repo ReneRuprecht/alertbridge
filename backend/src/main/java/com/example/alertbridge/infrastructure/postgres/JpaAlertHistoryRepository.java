@@ -9,5 +9,9 @@ import java.util.UUID;
 @Repository
 public interface JpaAlertHistoryRepository extends JpaRepository<AlertHistoryEntity, UUID> {
 
-    List<AlertHistoryEntity> findByFingerprint(String fingerprint);
+    List<AlertHistoryEntity> findByInstanceContaining(String instance);
+
+    boolean existsByAlertHash(
+            String alertHash
+    );
 }

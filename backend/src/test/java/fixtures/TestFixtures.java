@@ -26,6 +26,16 @@ public class TestFixtures {
         );
     }
 
+    public static AlertLabels defaultLabels(String instance) {
+        return new AlertLabels(
+                new AlertName("CPUHigh"),
+                new AlertEnvironment("prod"),
+                new AlertInstance(instance),
+                new AlertJob("node-exporter"),
+                AlertSeverity.CRITICAL
+        );
+    }
+
     public static AlertStartsAt alertStartsAt(Instant instant) {
         return new AlertStartsAt(instant);
     }
@@ -43,6 +53,24 @@ public class TestFixtures {
         return new AlertEvent(
                 fingerprint(fingerprint),
                 defaultLabels(),
+                AlertStatus.RESOLVED,
+                alertStartsAt(Instant.parse("2026-02-02T10:00:00Z"))
+        );
+    }
+
+    public static AlertEvent firingEvent(String fingerprint, String instance) {
+        return new AlertEvent(
+                fingerprint(fingerprint),
+                defaultLabels(instance),
+                AlertStatus.FIRING,
+                alertStartsAt(Instant.parse("2026-02-02T10:00:00Z"))
+        );
+    }
+
+    public static AlertEvent resolvedEvent(String fingerprint, String instance) {
+        return new AlertEvent(
+                fingerprint(fingerprint),
+                defaultLabels(instance),
                 AlertStatus.RESOLVED,
                 alertStartsAt(Instant.parse("2026-02-02T10:00:00Z"))
         );

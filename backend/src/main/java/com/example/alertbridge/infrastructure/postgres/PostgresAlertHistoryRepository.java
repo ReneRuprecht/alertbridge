@@ -3,7 +3,7 @@ package com.example.alertbridge.infrastructure.postgres;
 import com.example.alertbridge.domain.event.AlertEvent;
 import com.example.alertbridge.domain.model.AlertState;
 import com.example.alertbridge.domain.port.AlertHistoryRepository;
-import com.example.alertbridge.domain.value.AlertFingerprint;
+import com.example.alertbridge.domain.value.AlertInstance;
 import com.example.alertbridge.infrastructure.postgres.mapper.AlertHistoryMapper;
 import org.springframework.stereotype.Repository;
 
@@ -24,12 +24,18 @@ public class PostgresAlertHistoryRepository implements AlertHistoryRepository {
     }
 
     @Override
-    public List<AlertEvent> findByFingerprint(AlertFingerprint fingerprint) {
+    public List<AlertEvent> findByAlertInstance(AlertInstance instance) {
         return this.repository
-                .findByFingerprint(fingerprint.value())
+                .findByInstanceContaining(instance.value())
                 .stream()
                 .map(AlertHistoryMapper::toDomain)
                 .toList();
+    }
+
+    @Override
+    public boolean existsByAlertHash(AlertState state) {
+        String hash = AlertHistoryMapper.computeHash(state);
+        return this.repository.existsByAlertHash(hash);
     }
 
 }

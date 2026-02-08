@@ -1,9 +1,12 @@
-package com.example.alertbridge.infrastructure.postgres;
+package com.example.alertbridge.application;
 
+import com.example.alertbridge.application.alertstate.SaveAlertsToHistoryUseCase;
 import com.example.alertbridge.domain.event.AlertEvent;
-import com.example.alertbridge.domain.model.AlertState;
 import com.example.alertbridge.domain.value.AlertStatus;
+import com.example.alertbridge.infrastructure.postgres.JpaAlertHistoryRepository;
+import com.example.alertbridge.infrastructure.postgres.PostgresAlertHistoryRepository;
 import fixtures.TestFixtures;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
@@ -23,12 +26,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Testcontainers
 @Import(PostgresAlertHistoryRepository.class)
 @ActiveProfiles("postgres-it")
-public class PostgresAlertHistoryRepositoryIT {
-
+class SaveAlertsToHistoryUseCaseIT {
     @Container
     static PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:18-alpine");
+    SaveAlertsToHistoryUseCase useCase;
+    PostgresAlertHistoryRepository repository;
     @Autowired
-    private PostgresAlertHistoryRepository historyRepository;
+    JpaAlertHistoryRepository jpaAlertHistoryRepository;
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
@@ -42,35 +46,27 @@ public class PostgresAlertHistoryRepositoryIT {
         assertThat(postgres.isRunning()).isTrue();
     }
 
+    @BeforeEach
+    void setup() {
+        repository = new PostgresAlertHistoryRepository(jpaAlertHistoryRepository);
+        useCase = new SaveAlertsToHistoryUseCase(repository);
+    }
+
+
     @Test
-    void shouldPersistAndLoadAlertHistory() {
-        AlertState state = TestFixtures.firingAlert("fp-1");
-        AlertState stateResolved = TestFixtures.resolvedAlert("fp-1");
+    void shouldSaveAlertOnlyOnce() {
+        AlertEvent event = TestFixtures.firingEvent("fp-1");
 
-        this.historyRepository.save(state);
-        this.historyRepository.save(stateResolved);
+        this.useCase.execute(List.of(event));
 
-        List<AlertEvent> historyFromPostgres = this.historyRepository.findByAlertInstance(state
+        List<AlertEvent> historyFromPostgres = this.repository.findByAlertInstance(event
                 .labels()
                 .instance());
 
-        assertThat(historyFromPostgres.size()).isEqualTo(2);
-        assertThat(historyFromPostgres.getFirst().fingerprint()).isEqualTo(state.fingerprint);
+        assertThat(historyFromPostgres.size()).isEqualTo(1);
         assertThat(historyFromPostgres.getFirst().status()).isEqualTo(AlertStatus.FIRING);
-
-        assertThat(historyFromPostgres.get(1).status()).isEqualTo(AlertStatus.RESOLVED);
-    }
-
-
-    @Test
-    void shouldReturnTrueIfAlertExistsByAlertHash() {
-        AlertState state = TestFixtures.firingAlert("fp-1");
-
-        this.historyRepository.save(state);
-
-        boolean exists = historyRepository.existsByAlertHash(state);
-
-        assertThat(exists).isTrue();
     }
 
 }
+
+
