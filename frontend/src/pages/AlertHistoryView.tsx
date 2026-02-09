@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams, } from "react-router";
 import type { AlertHistory } from "../types/Alert";
 import { getHistoryAlert } from "../api/GetHistoryAlert";
 import AlertHistoryTable from "../components/AlertHistoryTable";
-import { formatAlertInstance } from "../utils/formatter";
+import { formatAlertInstance } from "../utils/Formatter";
 import './AlertHistoryView.css';
 
 export default function AlertHistoryView() {

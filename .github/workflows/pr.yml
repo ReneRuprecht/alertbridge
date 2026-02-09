@@ -18,6 +18,7 @@ jobs:
       pull-requests: read
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
     steps:
     - uses: actions/checkout@v4
     - uses: dorny/paths-filter@v3
@@ -26,9 +27,18 @@ jobs:
         filters: |
           backend:
             - 'backend/**'
+          frontend:
+            - 'frontend/**'
   backend:
     needs: changes
     if: needs.changes.outputs.backend == 'true'
     uses: ./.github/workflows/backend.yml
     permissions:
       checks: write
+
+  frontend:
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
+    uses: ./.github/workflows/frontend.yml
+    permissions:
+      pull-requests: write

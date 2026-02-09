@@ -1,5 +1,5 @@
 import type { AlertEvent } from "../types/Alert";
-import { formatAlertTime } from "../utils/formatter";
+import { formatAlertTime } from "../utils/Formatter";
 
 interface AlertItemProps {
   event: AlertEvent;

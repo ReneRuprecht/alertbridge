@@ -29,10 +29,14 @@ on:
       DOCKER_TOKEN:
         required: false
       VITE_API_BASE_URL:
-        required: true
+        required: false
 
 jobs:
+  test:
+    uses: ./.github/workflows/frontend-test.yml
+
   docker-build:
+    needs: test
     if: inputs.build || inputs.push
     uses: ./.github/workflows/docker-build.yml
     with:

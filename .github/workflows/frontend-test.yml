@@ -1,0 +1,33 @@
+
+name: Frontend Test
+
+on:
+  workflow_call:
+
+jobs:
+  test:
+    runs-on: self-hosted
+    container:
+      image: reneruprecht/ci-node24
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Npm install
+        working-directory: ./frontend
+        run: |
+          npm install
+
+      - name: Run tests
+        working-directory: ./frontend
+        run: |
+          npm run test:report
+
+      - name: 'Report Coverage'
+        if: always() 
+        uses:  davelosert/vitest-coverage-report-action@v2
+        with:
+          working-directory: ./frontend
+          name: Frontend
+          threshold-icons: "{0: '🔴', 80: '🟠', 90: '🟢'}"
+

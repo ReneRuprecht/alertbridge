@@ -45,6 +45,8 @@ jobs:
     uses: ./.github/workflows/frontend.yml
     with:
       push: true
+    permissions:
+      pull-requests: write
     secrets:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
