@@ -1,4 +1,4 @@
-import AlertTable from "../components/AlertTable";
+import AlertTable from '../components/AlertTable';
 
 export default function AlertTableView() {
   return (

@@ -4,8 +4,12 @@ import { it, expect, describe } from 'vitest';
 import { alertEventMock } from '../mocks/AlertEvent';
 
 describe('AlertHistoryTableItem', () => {
-  it('renders table rows', () => {
+  it('renders table rows', async () => {
     const event = alertEventMock;
+
+    vi.mock('../../src/utils/formatter', () => ({
+      formatAlertInstance: vi.fn(),
+    }));
 
     render(
       <table>

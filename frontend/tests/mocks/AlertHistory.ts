@@ -22,3 +22,9 @@ export const alertHistoryMock: AlertHistory = {
     },
   ],
 };
+
+export const alertHistoryWithEmptyEventsMock: AlertHistory = {
+  fingerprint: 'abc123',
+  instance: 'server-1',
+  events: [],
+};

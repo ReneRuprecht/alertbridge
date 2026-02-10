@@ -4,8 +4,8 @@ export interface AlertState {
   environment: string;
   instance: string;
   job: string;
-  severity: "CRITICAL" | "WARNING" | "INFO" | string;
-  status: "Firing" | "Resolved" | string;
+  severity: 'CRITICAL' | 'WARNING' | 'INFO' | string;
+  status: 'Firing' | 'Resolved' | string;
   startsAt: string;
 }
 
@@ -18,8 +18,8 @@ export interface AlertHistory {
 export interface AlertEvent {
   alertName: string;
   job: string;
-  severity: "CRITICAL" | "WARNING" | "INFO" | string;
-  status: "Firing" | "Resolved" | string;
+  severity: 'CRITICAL' | 'WARNING' | 'INFO' | string;
+  status: 'Firing' | 'Resolved' | string;
   startsAt: string;
   receivedAt: string;
 }

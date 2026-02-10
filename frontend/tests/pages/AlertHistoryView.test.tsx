@@ -1,7 +1,10 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import AlertHistoryView from '../../src/pages/AlertHistoryView';
 import { MemoryRouter, Route, Routes } from 'react-router';
-import { alertHistoryMock } from '../mocks/AlertHistory';
+import {
+  alertHistoryMock,
+  alertHistoryWithEmptyEventsMock,
+} from '../mocks/AlertHistory';
 import { getHistoryAlert } from '../../src/api/GetHistoryAlert';
 
 vi.mock('../../src/components/AlertHistoryTable', () => ({
@@ -182,5 +185,33 @@ describe('AlertHistoryView', () => {
       vi.advanceTimersByTime(600);
     });
     expect(screen.getByText('Keine History gefunden')).toBeInTheDocument();
+  });
+
+  it('renders missing event history error', async () => {
+    vi.mocked(getHistoryAlert).mockResolvedValue(
+      alertHistoryWithEmptyEventsMock,
+    );
+    vi.unmock('../../src/utils/formatter');
+    vi.useFakeTimers();
+
+    render(
+      <MemoryRouter initialEntries={[`/history/${alertHistory.instance}`]}>
+        <Routes>
+          <Route
+            path='/history/:alertInstance'
+            element={<AlertHistoryView />}
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await act(async () => {
+      vi.advanceTimersByTime(1000);
+    });
+    expect(
+      screen.getByText((content) =>
+        content.includes(`Keine Event History für ${alertHistory.instance}`),
+      ),
+    ).toBeInTheDocument();
   });
 });

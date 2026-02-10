@@ -46,7 +46,7 @@ export default function AlertHistoryView() {
   if (loading) return <h1>Lädt History von {alertInstance}</h1>;
   if (error) return <h1>Fehler: {error}</h1>;
   if (!history) return <h1>Keine History gefunden</h1>;
-  if (!history.events)
+  if (history.events.length === 0)
     return <h1>Keine Event History für {alertInstance} gefunden</h1>;
 
   return (
