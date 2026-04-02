@@ -1,12 +1,12 @@
 version: "2"
 sql:
   - engine: "postgresql"
-    queries: "internal/platform/psql/query.sql"
-    schema: "internal/platform/psql/schema.sql"
+    queries: "internal/platform/postgres_db/query.sql"
+    schema: "internal/platform/postgres_db/schema.sql"
     gen:
       go:
-        package: "psql"
-        out: "internal/platform/psql"
+        package: "postgres_db"
+        out: "internal/platform/postgres_db"
         sql_package: "pgx/v5"
         overrides:
           - column: "alerts.starts_at"

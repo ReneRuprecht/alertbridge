@@ -8,15 +8,15 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/reneruprecht/alertbridge/backend/internal/application"
 	"github.com/reneruprecht/alertbridge/backend/internal/infrastructure/alertmanager"
-	alertpostgres "github.com/reneruprecht/alertbridge/backend/internal/infrastructure/psql"
-	"github.com/reneruprecht/alertbridge/backend/internal/platform/psql"
+	"github.com/reneruprecht/alertbridge/backend/internal/infrastructure/postgres"
+	"github.com/reneruprecht/alertbridge/backend/internal/platform/postgres_db"
 )
 
 func main() {
 
 	ctx := context.Background()
 
-    connStr := "postgres://postgres:postgres@localhost:5432/alerts?sslmode=disable"
+	connStr := "postgres://postgres:postgres@localhost:5432/alerts?sslmode=disable"
 	conn, err := pgx.Connect(ctx, connStr)
 
 	if err != nil {
@@ -24,11 +24,11 @@ func main() {
 	}
 	defer conn.Close(ctx)
 
-    queries:= psql.New(conn)
+	queries := postgres_db.New(conn)
 
-    repo := alertpostgres.NewAlertRepository(queries)
+	repo := postgres.NewAlertRepository(queries)
 
-    receiveAlertUsecase := application.NewReceiveAlertUseCase(repo)
+	receiveAlertUsecase := application.NewReceiveAlertUseCase(repo)
 
 	mux := http.NewServeMux()
 
