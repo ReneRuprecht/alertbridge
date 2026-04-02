@@ -6,4 +6,5 @@ type Alert struct {
 	Labels      map[string]string
 	Annotations map[string]string
 	StartAt     Timestamp
+	ResolvedAt  Timestamp
 }

@@ -10,10 +10,14 @@ jobs:
   test:
     runs-on: homelab
     container:
-      image: golang:1.26-alpine
+      image: reneruprecht/ci-golang126:latest
 
     steps:
       - uses: actions/checkout@v6
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: go mod tidy
 
       - name: Run tests
         working-directory: ./backend
