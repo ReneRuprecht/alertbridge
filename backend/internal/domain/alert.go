@@ -1,14 +1,5 @@
 package domain
 
-import "time"
-
-type Fingerprint string
-
-
-type Timestamp struct {
-	time.Time
-}
-
 type Alert struct {
 	Fingerprint Fingerprint
 	Status      Status
