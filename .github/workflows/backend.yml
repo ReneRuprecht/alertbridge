@@ -1,0 +1,20 @@
+name: Go Backend
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    runs-on: homelab
+    container:
+      image: golang:1.26-alpine
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Run tests
+        working-directory: ./backend
+        run: go test ./... -v
