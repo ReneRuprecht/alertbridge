@@ -27,6 +27,14 @@ func (m *MockRepo) Save(ctx context.Context, a domain.Alert) error {
 	return nil
 }
 
+func (m *MockRepo) FindAlertsByInstance(ctx context.Context, instance string) ([]domain.Alert, error) {
+	if m.Err != nil {
+		return nil, m.Err
+	}
+
+	return nil, nil
+}
+
 func newHandleWebhook() http.HandlerFunc {
 	mockRepo := &MockRepo{}
 	uc := application.NewReceiveAlertUseCase(mockRepo)
