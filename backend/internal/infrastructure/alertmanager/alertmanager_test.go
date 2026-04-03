@@ -35,9 +35,31 @@ func (m *MockRepo) FindAlertsByInstance(ctx context.Context, instance string) ([
 	return nil, nil
 }
 
+type MockCache struct {
+	Saved []domain.Alert
+	Err   error
+}
+
+func (m *MockCache) Save(ctx context.Context, a domain.Alert) error {
+	if m.Err != nil {
+		return m.Err
+	}
+	m.Saved = append(m.Saved, a)
+	return nil
+}
+
+func (m *MockCache) ListAlerts(ctx context.Context) ([]application.AlertCacheDto, error) {
+	if m.Err != nil {
+		return nil, m.Err
+	}
+
+	return nil, nil
+}
+
 func newHandleWebhook() http.HandlerFunc {
 	mockRepo := &MockRepo{}
-	uc := application.NewReceiveAlertUseCase(mockRepo)
+	mockCache := &MockCache{}
+	uc := application.NewReceiveAlertUseCase(mockRepo, mockCache)
 	handler := alertmanager.HandleWebhook(uc)
 	return handler
 }
