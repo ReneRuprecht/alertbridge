@@ -12,7 +12,7 @@ import (
 	"github.com/reneruprecht/alertbridge/backend/internal/infrastructure/alertmanager"
 )
 
-const webhook_url = "/api/v1/alerts"
+const webhook_url = "/api/v1/alertmanager"
 
 type MockRepo struct {
 	Saved []domain.Alert
