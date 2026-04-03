@@ -32,7 +32,7 @@ func (r *AlertRepository) Save(ctx context.Context, alert domain.Alert) error {
 
 func (r *AlertRepository) FindAlertsByInstance(ctx context.Context, instance string) ([]domain.Alert, error) {
 
-	rows, err := r.queries.FindAlertByInstance(ctx, instance)
+	rows, err := r.queries.FindAlertsByInstance(ctx, instance)
 
 	if err != nil {
 		return nil, err

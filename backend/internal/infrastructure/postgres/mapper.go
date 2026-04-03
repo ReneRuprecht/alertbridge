@@ -29,7 +29,7 @@ func toDto(alert domain.Alert) AlertDto {
 	}
 }
 
-func toDomain(row postgres_db.FindAlertByInstanceRow) (domain.Alert, error) {
+func toDomain(row postgres_db.FindAlertsByInstanceRow) (domain.Alert, error) {
 
 	fp, err := domain.NewFingerprint(row.Fingerprint)
 
