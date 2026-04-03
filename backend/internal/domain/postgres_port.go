@@ -1,5 +1,7 @@
 package domain
 
+import "context"
+
 type AlertRepository interface {
-	Save(alert Alert) error
+	Save(context context.Context, alert Alert) error
 }

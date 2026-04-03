@@ -32,7 +32,8 @@ func HandleWebhook(uc *application.ReceiveAlertUsecase) http.HandlerFunc {
 			return
 		}
 
-		if err := uc.Execute(alerts); err != nil {
+		ctx := r.Context()
+		if err := uc.Execute(ctx, alerts); err != nil {
 
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

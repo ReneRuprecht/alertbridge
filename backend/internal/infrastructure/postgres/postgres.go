@@ -15,11 +15,11 @@ func NewAlertRepository(queries *postgres_db.Queries) *AlertRepository {
 	return &AlertRepository{queries: queries}
 }
 
-func (r *AlertRepository) Save(alert domain.Alert) error {
+func (r *AlertRepository) Save(ctx context.Context, alert domain.Alert) error {
 
 	alertDto := toDto(alert)
 
-	return r.queries.InsertAlert(context.Background(), postgres_db.InsertAlertParams{
+	return r.queries.InsertAlert(ctx, postgres_db.InsertAlertParams{
 		Fingerprint: alertDto.Fingerprint,
 		Instance:    alertDto.Instance,
 		Status:      alertDto.Status,

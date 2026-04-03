@@ -79,7 +79,7 @@ func (suite *AlertRepositoryTestSuite) TestAlertRepository_SaveOne() {
 
 	alert := domain.Alert{Fingerprint: fp, Status: status, StartAt: startsAt}
 
-	repoError := suite.repo.Save(alert)
+	repoError := suite.repo.Save(suite.ctx, alert)
 	suite.Require().NoError(repoError)
 
 	var count int
@@ -114,7 +114,7 @@ func (suite *AlertRepositoryTestSuite) TestAlertRepository_SaveMany() {
 
 	for _, alert := range alerts {
 
-		repoError := suite.repo.Save(alert)
+		repoError := suite.repo.Save(suite.ctx, alert)
 		suite.Assert().NoError(repoError)
 	}
 

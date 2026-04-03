@@ -1,6 +1,7 @@
 package alertmanager_test
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -18,7 +19,7 @@ type MockRepo struct {
 	Err   error
 }
 
-func (m *MockRepo) Save(a domain.Alert) error {
+func (m *MockRepo) Save(ctx context.Context, a domain.Alert) error {
 	if m.Err != nil {
 		return m.Err
 	}

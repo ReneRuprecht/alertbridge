@@ -1,6 +1,7 @@
 package application
 
 import (
+	"context"
 	"log"
 
 	"github.com/reneruprecht/alertbridge/backend/internal/domain"
@@ -14,10 +15,10 @@ func NewReceiveAlertUseCase(repo domain.AlertRepository) *ReceiveAlertUsecase {
 	return &ReceiveAlertUsecase{repo: repo}
 }
 
-func (uc *ReceiveAlertUsecase) Execute(alerts []domain.Alert) error {
+func (uc *ReceiveAlertUsecase) Execute(ctx context.Context, alerts []domain.Alert) error {
 	for _, a := range alerts {
 
-		if err := uc.repo.Save(a); err != nil {
+		if err := uc.repo.Save(ctx, a); err != nil {
 			log.Printf("ReceiveAlertUsecase error %v", err)
 			return err
 		}
