@@ -18,7 +18,7 @@ func (uc *ReceiveAlertUsecase) Execute(alerts []domain.Alert) error {
 	for _, a := range alerts {
 
 		if err := uc.repo.Save(a); err != nil {
-            log.Printf("ReceiveAlertUsecase error %v", err)
+			log.Printf("ReceiveAlertUsecase error %v", err)
 			return err
 		}
 	}

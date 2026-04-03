@@ -38,16 +38,16 @@ func (suite *AlertRepositoryTestSuite) SetupSuite() {
 		pg.BasicWaitStrategies(),
 	)
 
-    suite.Require().NoError(err)
+	suite.Require().NoError(err)
 
 	suite.pgContainer = postgresContainer
 	connStr, err := postgresContainer.ConnectionString(suite.ctx, "sslmode=disable")
 
-    suite.Require().NoError(err)
+	suite.Require().NoError(err)
 
 	conn, err := pgx.Connect(suite.ctx, connStr)
 
-    suite.Require().NoError(err)
+	suite.Require().NoError(err)
 
 	suite.conn = conn
 
@@ -64,7 +64,7 @@ func (suite *AlertRepositoryTestSuite) TearDownSuite() {
 
 func (suite *AlertRepositoryTestSuite) clearTables() {
 	_, err := suite.conn.Exec(suite.ctx, "TRUNCATE alerts CASCADE")
-    suite.Require().NoError(err)
+	suite.Require().NoError(err)
 }
 
 func (suite *AlertRepositoryTestSuite) SetupTest() {
@@ -112,17 +112,17 @@ func (suite *AlertRepositoryTestSuite) TestAlertRepository_SaveMany() {
 		},
 	}
 
-	for _, a := range alerts {
+	for _, alert := range alerts {
 
-		repoError := suite.repo.Save(a)
+		repoError := suite.repo.Save(alert)
 		suite.Assert().NoError(repoError)
 	}
 
 	var count int
 	err := suite.conn.QueryRow(suite.ctx, "SELECT count(*) FROM alerts").Scan(&count)
 
-    suite.Require().NoError(err)
-    suite.Assert().Equal(2, count)
+	suite.Require().NoError(err)
+	suite.Assert().Equal(2, count)
 
 }
 
