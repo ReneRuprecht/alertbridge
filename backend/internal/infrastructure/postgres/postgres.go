@@ -29,3 +29,27 @@ func (r *AlertRepository) Save(ctx context.Context, alert domain.Alert) error {
 		Annotations: alertDto.Annotations,
 	})
 }
+
+func (r *AlertRepository) FindAlertsByInstance(ctx context.Context, instance string) ([]domain.Alert, error) {
+
+	rows, err := r.queries.FindAlertByInstance(ctx, instance)
+
+	if err != nil {
+		return nil, err
+	}
+
+	alerts := make([]domain.Alert, len(rows))
+
+	for i, row := range rows {
+		alert, err := toDomain(row)
+
+		if err != nil {
+			return nil, err
+		}
+
+		alerts[i] = alert
+
+	}
+
+	return alerts, nil
+}
