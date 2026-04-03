@@ -13,6 +13,7 @@ import (
 type Alert struct {
 	ID          pgtype.UUID
 	Fingerprint string
+	Instance    string
 	Status      string
 	StartsAt    time.Time
 	ResolvedAt  time.Time

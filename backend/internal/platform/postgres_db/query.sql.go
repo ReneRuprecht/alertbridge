@@ -11,13 +11,14 @@ import (
 )
 
 const insertAlert = `-- name: InsertAlert :exec
-INSERT INTO alerts (fingerprint, status, starts_at, resolved_at, labels, annotations)
-VALUES ($1, $2, $3, $4, $5, $6)
+INSERT INTO alerts (fingerprint, instance, status, starts_at, resolved_at, labels, annotations)
+VALUES ($1, $2, $3, $4, $5, $6, $7)
 ON CONFLICT (fingerprint, status, starts_at) DO NOTHING
 `
 
 type InsertAlertParams struct {
 	Fingerprint string
+	Instance    string
 	Status      string
 	StartsAt    time.Time
 	ResolvedAt  time.Time
@@ -28,6 +29,7 @@ type InsertAlertParams struct {
 func (q *Queries) InsertAlert(ctx context.Context, arg InsertAlertParams) error {
 	_, err := q.db.Exec(ctx, insertAlert,
 		arg.Fingerprint,
+		arg.Instance,
 		arg.Status,
 		arg.StartsAt,
 		arg.ResolvedAt,
