@@ -2,66 +2,24 @@ package alertmanager_test
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
-	"github.com/reneruprecht/alertbridge/backend/internal/application"
 	"github.com/reneruprecht/alertbridge/backend/internal/domain"
 	"github.com/reneruprecht/alertbridge/backend/internal/infrastructure/alertmanager"
 )
 
 const webhook_url = "/api/v1/alertmanager"
 
-type MockRepo struct {
-	Saved []domain.Alert
-	Err   error
+type mockUseCase struct {
+	err error
 }
 
-func (m *MockRepo) Save(ctx context.Context, a domain.Alert) error {
-	if m.Err != nil {
-		return m.Err
-	}
-	m.Saved = append(m.Saved, a)
-	return nil
-}
-
-func (m *MockRepo) FindAlertsByInstance(ctx context.Context, instance string) ([]domain.Alert, error) {
-	if m.Err != nil {
-		return nil, m.Err
-	}
-
-	return nil, nil
-}
-
-type MockCache struct {
-	Saved []domain.Alert
-	Err   error
-}
-
-func (m *MockCache) Save(ctx context.Context, a domain.Alert) error {
-	if m.Err != nil {
-		return m.Err
-	}
-	m.Saved = append(m.Saved, a)
-	return nil
-}
-
-func (m *MockCache) ListAlerts(ctx context.Context) ([]application.AlertCacheDto, error) {
-	if m.Err != nil {
-		return nil, m.Err
-	}
-
-	return nil, nil
-}
-
-func newHandleWebhook() http.HandlerFunc {
-	mockRepo := &MockRepo{}
-	mockCache := &MockCache{}
-	uc := application.NewReceiveAlertUseCase(mockRepo, mockCache)
-	handler := alertmanager.HandleWebhook(uc)
-	return handler
+func (m *mockUseCase) Execute(ctx context.Context, alerts []domain.Alert) error {
+	return m.err
 }
 
 func TestHandleWebhook_OK(t *testing.T) {
@@ -82,7 +40,10 @@ func TestHandleWebhook_OK(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, webhook_url, strings.NewReader(body))
 	w := httptest.NewRecorder()
 
-	handler := newHandleWebhook()
+	uc := &mockUseCase{
+		err: nil,
+	}
+	handler := alertmanager.HandleWebhook(uc)
 	handler.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
@@ -94,7 +55,10 @@ func TestHandleWebhook_InvalidJSON(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, webhook_url, strings.NewReader("{invalid"))
 	w := httptest.NewRecorder()
 
-	handler := newHandleWebhook()
+	uc := &mockUseCase{
+		err: nil,
+	}
+	handler := alertmanager.HandleWebhook(uc)
 	handler.ServeHTTP(w, req)
 
 	if w.Code != http.StatusBadRequest {
@@ -106,7 +70,10 @@ func TestHandleWebhook_MethodNotAllowed(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, webhook_url, nil)
 	w := httptest.NewRecorder()
 
-	handler := newHandleWebhook()
+	uc := &mockUseCase{
+		err: nil,
+	}
+	handler := alertmanager.HandleWebhook(uc)
 	handler.ServeHTTP(w, req)
 
 	if w.Code != http.StatusMethodNotAllowed {
@@ -132,10 +99,42 @@ func TestHandleWebhook_InvalidRequest(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, webhook_url, strings.NewReader(body))
 	w := httptest.NewRecorder()
 
-	handler := newHandleWebhook()
+	uc := &mockUseCase{
+		err: nil,
+	}
+	handler := alertmanager.HandleWebhook(uc)
 	handler.ServeHTTP(w, req)
 
 	if w.Code != http.StatusBadRequest {
 		t.Fatalf("expected 405, got %d", w.Code)
+	}
+}
+
+func TestHandleWebhook_InternalServerError(t *testing.T) {
+	body := `{
+        "alerts": [{
+            "status": "firing",
+            "fingerprint": "abc",
+            "startsAt": "2026-04-02T10:00:00Z",
+            "annotations": {
+                "team": "dev"
+            },
+            "labels": {
+                "env": "dev"
+            }
+        }]
+    }`
+
+	req := httptest.NewRequest(http.MethodPost, webhook_url, strings.NewReader(body))
+	w := httptest.NewRecorder()
+
+	uc := &mockUseCase{
+		err: errors.New("failed"),
+	}
+	handler := alertmanager.HandleWebhook(uc)
+	handler.ServeHTTP(w, req)
+
+	if w.Code != http.StatusInternalServerError {
+		t.Fatalf("expected 500, got %d", w.Code)
 	}
 }

@@ -7,6 +7,10 @@ import (
 	"github.com/reneruprecht/alertbridge/backend/internal/domain"
 )
 
+type ReceiveAlertUsecaseInterface interface {
+	Execute(ctx context.Context, alerts []domain.Alert) error
+}
+
 type ReceiveAlertUsecase struct {
 	repo  domain.AlertRepository
 	cache AlertCache

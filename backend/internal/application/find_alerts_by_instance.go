@@ -7,6 +7,10 @@ import (
 	"github.com/reneruprecht/alertbridge/backend/internal/domain"
 )
 
+type FindAlertsByInstanceUseCaseInterface interface {
+	Execute(ctx context.Context, instance string) ([]domain.Alert, error)
+}
+
 type FindAlertsByInstanceUseCase struct {
 	repo domain.AlertRepository
 }

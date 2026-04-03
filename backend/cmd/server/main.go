@@ -48,8 +48,8 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/api/v1/alertmanager", alertmanager.HandleWebhook(receiveAlertUsecase))
-	mux.HandleFunc("/api/v1/alerts", alert.HandleFindAlertsByInstance(findAlertsByInstanceUseCase))
-	mux.HandleFunc("/api/v1/alerts/active", alert.HandleListActiveAlerts(listCachedAlertsUseCase))
+	mux.HandleFunc("/api/v1/alerts/{instance}", alert.HandleFindAlertsByInstance(findAlertsByInstanceUseCase))
+	mux.HandleFunc("/api/v1/alerts", alert.HandleListActiveAlerts(listCachedAlertsUseCase))
 
 	log.Println("Server running on :8080")
 	serverError := http.ListenAndServe(":8080", mux)

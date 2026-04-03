@@ -5,6 +5,10 @@ import (
 	"log"
 )
 
+type ListActiveAlertsUseCaseInterface interface {
+	Execute([]AlertCacheDto, error)
+}
+
 type ListActiveAlertsUseCase struct {
 	cache AlertCache
 }

@@ -7,14 +7,14 @@ import (
 	"github.com/reneruprecht/alertbridge/backend/internal/application"
 )
 
-func HandleFindAlertsByInstance(uc *application.FindAlertsByInstanceUseCase) http.HandlerFunc {
+func HandleFindAlertsByInstance(uc application.FindAlertsByInstanceUseCaseInterface) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
 
-		instance := r.URL.Query().Get("instance")
+		instance := r.PathValue("instance")
 		if instance == "" {
 			http.Error(w, "instance is required", http.StatusBadRequest)
 		}
