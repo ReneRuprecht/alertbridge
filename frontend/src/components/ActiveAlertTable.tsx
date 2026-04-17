@@ -13,7 +13,11 @@ export default function ActiveAlertTable() {
         const fetchActiveAlerts = async () => {
             try {
                 const data: ActiveAlerts = await getActiveAlerts()
-                setAlerts(data.alerts)
+
+                const sorted = [...data.alerts].sort((a, b) =>
+                    a.instance.localeCompare(b.instance)
+                );
+                setAlerts(sorted)
             }
             catch (err: any) {
                 console.error(err)
