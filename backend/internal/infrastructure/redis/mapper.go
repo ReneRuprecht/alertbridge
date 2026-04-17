@@ -16,6 +16,11 @@ func toDto(alert domain.Alert) alertDto {
 		instance = inst
 	}
 
+	job := alert.Labels["job"]
+	if job == "" {
+		job = "unknown"
+	}
+
 	alertName := "unknown"
 
 	alertNameLabel := alert.Labels["alertname"]
@@ -26,6 +31,7 @@ func toDto(alert domain.Alert) alertDto {
 	return alertDto{
 		Fingerprint: string(alert.Fingerprint),
 		Instance:    instance,
+		Job:         job,
 		StartsAt:    alert.StartAt.Time,
 		AlertName:   alertName,
 		Status:      string(alert.Status),
@@ -37,6 +43,7 @@ func toCacheDto(alert alertDto) application.AlertCacheDto {
 	return application.AlertCacheDto{
 		Fingerprint: alert.Fingerprint,
 		Instance:    alert.Instance,
+		Job:         alert.Job,
 		Status:      alert.Status,
 		StartsAt:    alert.StartsAt,
 		AlertName:   alert.AlertName,

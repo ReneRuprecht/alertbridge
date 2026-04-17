@@ -2,6 +2,7 @@ export interface Alert {
   fingerprint: string;
   alertName: string;
   instance: string;
+  job: string;
   status: "firing" | "resolved";
   startsAt: string;
 }

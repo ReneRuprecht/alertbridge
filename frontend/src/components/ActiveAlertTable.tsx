@@ -38,6 +38,7 @@ export default function ActiveAlertTable() {
             <thead>
                 <tr>
                     <th>Name</th>
+                    <th>Job</th>
                     <th>Instance</th>
                     <th>Angefangen</th>
                     <th>Status</th>

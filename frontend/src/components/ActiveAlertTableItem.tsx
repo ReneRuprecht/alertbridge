@@ -16,6 +16,7 @@ export default function ActiveAlertTableItem({ alert }: ActiveAlertItemProps) {
             }
         >
             <td>{alert.alertName}</td>
+            <td>{alert.job}</td>
             <td>{formatAlertInstance(alert.instance)}</td>
             <td>{formatAlertTime(alert.startsAt)}</td>
             <td>{formatAlertStatus(alert.status)}</td>
