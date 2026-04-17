@@ -1,10 +1,35 @@
-import type { AlertHistory } from "../types/Alert";
+import { useMemo } from "react";
+import type { AlertHistory, HistoryAlert } from "../types/Alert";
 import AlertHistoryTableItem from "./AlertHistoryTableItem";
 
 interface AlertHistoryProps {
     alertHistory: AlertHistory;
 }
+
+function getKeyFromAlert(alert: HistoryAlert): string {
+    return `${alert.fingerprint}-${alert.startsAt}-${alert.job}`;
+}
+
 export default function AlertHistoryTable({ alertHistory }: AlertHistoryProps) {
+    const activeAlerts = useMemo(() => {
+        const map = new Map<string, HistoryAlert>();
+
+        alertHistory.alerts.forEach(alert => {
+            const key = getKeyFromAlert(alert)
+
+            const existing = map.get(key);
+
+            if (!existing) {
+                map.set(key, alert);
+            } else {
+                map.delete(key)
+            }
+
+        });
+
+        return map;
+    }, [alertHistory.alerts]);
+
     return (
         <table>
             <thead>
@@ -19,12 +44,18 @@ export default function AlertHistoryTable({ alertHistory }: AlertHistoryProps) {
                 </tr>
             </thead>
             <tbody>
-                {alertHistory.alerts.map((alert) => (
-                    <AlertHistoryTableItem
-                        key={`${alert.fingerprint}-${alert.receivedAt}`}
-                        alert={alert}
-                    ></AlertHistoryTableItem>
-                ))}
+                {alertHistory.alerts.map((alert) => {
+                    const key = getKeyFromAlert(alert)
+                    const isActive = activeAlerts.get(key)?.status.toLowerCase() === "firing";
+
+                    return (
+                        <AlertHistoryTableItem
+                            key={`${alert.fingerprint}-${alert.receivedAt}`}
+                            alert={alert}
+                            isActive={isActive}
+                        />
+                    );
+                })}
             </tbody>
         </table>
     );

@@ -21,7 +21,6 @@ export default function AlertHistoryView() {
                     return
                 }
                 const data = await getAlertHistory(alertInstance);
-                console.log(data)
                 setAlertHistory(data);
             } catch (e: any) {
                 setError(e.message);
