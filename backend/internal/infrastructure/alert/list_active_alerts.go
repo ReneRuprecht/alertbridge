@@ -22,10 +22,7 @@ func HandleListActiveAlerts(uc *application.ListActiveAlertsUseCase) http.Handle
 			return
 		}
 
-		dto := ListActiveAlertsDto{
-			Alerts: alerts,
-		}
-
+		dto := toListActiveAlertDto(alerts)
 		json.NewEncoder(w).Encode(dto)
 	}
 }

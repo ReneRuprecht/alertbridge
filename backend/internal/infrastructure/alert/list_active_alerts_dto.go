@@ -1,9 +1,17 @@
 package alert
 
 import (
-	"github.com/reneruprecht/alertbridge/backend/internal/application"
+	"time"
 )
 
 type ListActiveAlertsDto struct {
-	Alerts []application.AlertCacheDto `json:"alerts"`
+	Alerts []ActiveAlert `json:"alerts"`
+}
+
+type ActiveAlert struct {
+	Fingerprint string    `json:"fingerprint"`
+	Instance    string    `json:"instance"`
+	Status      string    `json:"status"`
+	StartsAt    time.Time `json:"startsAt"`
+	AlertName   string    `json:"alertName"`
 }
