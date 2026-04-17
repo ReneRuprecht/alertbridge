@@ -16,7 +16,7 @@ type Alert struct {
 	Instance    string
 	Status      string
 	StartsAt    time.Time
-	ResolvedAt  time.Time
+	ReceivedAt  time.Time
 	Labels      map[string]string
 	Annotations map[string]string
 }

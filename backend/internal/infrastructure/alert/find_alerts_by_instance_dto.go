@@ -1,8 +1,19 @@
 package alert
 
-import "github.com/reneruprecht/alertbridge/backend/internal/domain"
+import "time"
+
+type AlertHistory struct {
+	Fingerprint string    `json:"fingerprint"`
+	Status      string    `json:"status"`
+	AlertName   string    `json:"alertName"`
+	Job         string    `json:"job"`
+	Description string    `json:"description"`
+	Severity    string    `json:"severity"`
+	StartAt     time.Time `json:"startsAt"`
+	ReceivedAt  time.Time `json:"receivedAt"`
+}
 
 type FindAlertsByInstanceDto struct {
 	Instance string         `json:"instance"`
-	Alerts   []domain.Alert `json:"alerts"`
+	Alerts   []AlertHistory `json:"alerts"`
 }

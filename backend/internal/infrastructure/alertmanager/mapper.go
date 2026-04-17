@@ -28,17 +28,16 @@ func toDomain(req WebhookRequest) ([]domain.Alert, error) {
 			return nil, err
 		}
 
-		var resolvedAt domain.Timestamp
-
-		if status == domain.StatusResolved {
-			resolvedAt = domain.Timestamp{Time: time.Now()}
+		receivedAt, err := domain.NewTimestamp(time.Now().Format(time.RFC3339))
+		if err != nil {
+			return nil, err
 		}
 
 		alerts[i] = domain.Alert{
 			Fingerprint: fingerprint,
 			Status:      status,
 			StartAt:     startsAt,
-			ResolvedAt:  resolvedAt,
+			ReceivedAt:  receivedAt,
 			Labels:      alert.Labels,
 			Annotations: alert.Annotations,
 		}

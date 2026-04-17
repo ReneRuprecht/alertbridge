@@ -12,6 +12,9 @@ sql:
           - column: "alerts.starts_at"
             go_type:
               type: "time.Time"
+          - column: "alerts.received_at"
+            go_type:
+              type: "time.Time"
           - column: "alerts.resolved_at"
             go_type:
               type: "time.Time"

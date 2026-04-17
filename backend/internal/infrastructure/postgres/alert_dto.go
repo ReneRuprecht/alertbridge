@@ -8,8 +8,8 @@ type AlertDto struct {
 	Fingerprint string
 	Instance    string
 	Status      string
+	ReceivedAt  time.Time
 	StartsAt    time.Time
-	ResolvedAt  time.Time
 	Labels      map[string]string
 	Annotations map[string]string
 }

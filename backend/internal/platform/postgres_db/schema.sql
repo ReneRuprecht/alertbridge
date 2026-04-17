@@ -6,7 +6,7 @@ CREATE TABLE alerts (
     instance TEXT NOT NULL,
     status TEXT NOT NULL,
     starts_at TIMESTAMP WITH TIME ZONE NOT NULL,
-    resolved_at TIMESTAMP WITH TIME ZONE,
+    received_at TIMESTAMP WITH TIME ZONE NOT NULL,
     labels JSONB,
     annotations JSONB
 );

@@ -24,7 +24,7 @@ func (r *AlertRepository) Save(ctx context.Context, alert domain.Alert) error {
 		Instance:    alertDto.Instance,
 		Status:      alertDto.Status,
 		StartsAt:    alertDto.StartsAt,
-		ResolvedAt:  alertDto.ResolvedAt,
+		ReceivedAt:  alertDto.ReceivedAt,
 		Labels:      alertDto.Labels,
 		Annotations: alertDto.Annotations,
 	})

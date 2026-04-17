@@ -9,3 +9,19 @@ export interface Alert {
 export interface ActiveAlerts {
   alerts: Alert[];
 }
+
+export interface AlertHistory {
+  instance: string;
+  alerts: HistoryAlert[];
+}
+
+export interface HistoryAlert {
+  fingerprint: string;
+  alertName: string;
+  status: "firing" | "resolved";
+  receivedAt: string;
+  startsAt: string;
+  job: string;
+  description: string;
+  severity: string;
+}

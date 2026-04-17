@@ -22,8 +22,8 @@ func toDto(alert domain.Alert) AlertDto {
 		Fingerprint: string(alert.Fingerprint),
 		Instance:    instance,
 		Status:      string(alert.Status),
+		ReceivedAt:  alert.ReceivedAt.Time,
 		StartsAt:    alert.StartAt.Time,
-		ResolvedAt:  alert.ResolvedAt.Time,
 		Labels:      alert.Labels,
 		Annotations: alert.Annotations,
 	}
@@ -47,9 +47,9 @@ func toDomain(row postgres_db.FindAlertsByInstanceRow) (domain.Alert, error) {
 		log.Println(row.StartsAt.String())
 		return domain.Alert{}, err
 	}
-	resolvedAt, err := domain.NewTimestamp(row.ResolvedAt.Format(time.RFC3339))
+	receivedAt, err := domain.NewTimestamp(row.ReceivedAt.Format(time.RFC3339))
 	if err != nil {
-		log.Println(err)
+		log.Println(row.ReceivedAt.String())
 		return domain.Alert{}, err
 	}
 	labels := row.Labels
@@ -59,7 +59,7 @@ func toDomain(row postgres_db.FindAlertsByInstanceRow) (domain.Alert, error) {
 		Fingerprint: fp,
 		Status:      status,
 		StartAt:     startsAt,
-		ResolvedAt:  resolvedAt,
+		ReceivedAt:  receivedAt,
 		Labels:      labels,
 		Annotations: annotations,
 	}, nil

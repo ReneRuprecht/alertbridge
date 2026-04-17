@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router';
 import type { Alert } from '../types/Alert';
 import { formatAlertInstance, formatAlertStatus, formatAlertTime } from '../utils/Formatter';
 
@@ -6,9 +7,14 @@ interface ActiveAlertItemProps {
 }
 
 export default function ActiveAlertTableItem({ alert }: ActiveAlertItemProps) {
+    const navigate = useNavigate();
 
     return (
-        <tr>
+        <tr
+            onClick={() =>
+                navigate(`/${formatAlertInstance(alert.instance)}`)
+            }
+        >
             <td>{alert.alertName}</td>
             <td>{formatAlertInstance(alert.instance)}</td>
             <td>{formatAlertTime(alert.startsAt)}</td>

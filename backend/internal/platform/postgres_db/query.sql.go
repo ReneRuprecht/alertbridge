@@ -11,8 +11,9 @@ import (
 )
 
 const findAlertsByInstance = `-- name: FindAlertsByInstance :many
-SELECT fingerprint, instance, status, starts_at, resolved_at, labels, annotations FROM alerts 
+SELECT fingerprint, instance, status, starts_at, received_at, labels, annotations FROM alerts 
 WHERE instance=$1
+ORDER BY received_at DESC
 `
 
 type FindAlertsByInstanceRow struct {
@@ -20,7 +21,7 @@ type FindAlertsByInstanceRow struct {
 	Instance    string
 	Status      string
 	StartsAt    time.Time
-	ResolvedAt  time.Time
+	ReceivedAt  time.Time
 	Labels      map[string]string
 	Annotations map[string]string
 }
@@ -39,7 +40,7 @@ func (q *Queries) FindAlertsByInstance(ctx context.Context, instance string) ([]
 			&i.Instance,
 			&i.Status,
 			&i.StartsAt,
-			&i.ResolvedAt,
+			&i.ReceivedAt,
 			&i.Labels,
 			&i.Annotations,
 		); err != nil {
@@ -54,7 +55,7 @@ func (q *Queries) FindAlertsByInstance(ctx context.Context, instance string) ([]
 }
 
 const insertAlert = `-- name: InsertAlert :exec
-INSERT INTO alerts (fingerprint, instance, status, starts_at, resolved_at, labels, annotations)
+INSERT INTO alerts (fingerprint, instance, status, starts_at, received_at, labels, annotations)
 VALUES ($1, $2, $3, $4, $5, $6, $7)
 ON CONFLICT (fingerprint, status, starts_at) DO NOTHING
 `
@@ -64,7 +65,7 @@ type InsertAlertParams struct {
 	Instance    string
 	Status      string
 	StartsAt    time.Time
-	ResolvedAt  time.Time
+	ReceivedAt  time.Time
 	Labels      map[string]string
 	Annotations map[string]string
 }
@@ -75,7 +76,7 @@ func (q *Queries) InsertAlert(ctx context.Context, arg InsertAlertParams) error 
 		arg.Instance,
 		arg.Status,
 		arg.StartsAt,
-		arg.ResolvedAt,
+		arg.ReceivedAt,
 		arg.Labels,
 		arg.Annotations,
 	)
