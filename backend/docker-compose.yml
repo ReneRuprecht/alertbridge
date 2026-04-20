@@ -14,6 +14,8 @@ services:
       interval: 10s
       timeout: 10s
       retries: 10
+    volumes:
+      - ./internal/platform/postgres_db/schema.sql:/docker-entrypoint-initdb.d/init.sql
 
   redis:
     container_name: redis
