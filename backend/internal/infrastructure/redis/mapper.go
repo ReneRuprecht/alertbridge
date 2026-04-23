@@ -28,6 +28,11 @@ func toDto(alert domain.Alert) alertDto {
 		alertName = alertNameLabel
 	}
 
+	severity := alert.Labels["severity"]
+	if severity == "" {
+		severity = "unknown"
+	}
+
 	return alertDto{
 		Fingerprint: string(alert.Fingerprint),
 		Instance:    instance,
@@ -35,6 +40,7 @@ func toDto(alert domain.Alert) alertDto {
 		StartsAt:    alert.StartAt.Time,
 		AlertName:   alertName,
 		Status:      string(alert.Status),
+		Severity:    severity,
 	}
 }
 
@@ -47,5 +53,6 @@ func toCacheDto(alert alertDto) application.AlertCacheDto {
 		Status:      alert.Status,
 		StartsAt:    alert.StartsAt,
 		AlertName:   alert.AlertName,
+		Severity:    alert.Severity,
 	}
 }

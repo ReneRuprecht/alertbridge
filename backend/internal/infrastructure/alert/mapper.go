@@ -16,6 +16,7 @@ func toListActiveAlertDto(cachedAlerts []application.AlertCacheDto) ListActiveAl
 			Instance:    alert.Instance,
 			Job:         alert.Job,
 			Status:      alert.Status,
+			Severity:    alert.Severity,
 			StartsAt:    alert.StartsAt,
 		}
 

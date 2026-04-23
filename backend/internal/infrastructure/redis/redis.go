@@ -3,6 +3,7 @@ package redis
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -68,10 +69,24 @@ func (r *AlertCache) Save(ctx context.Context, alert domain.Alert) error {
 		return err
 	}
 
-	_, redisErr := r.client.Set(ctx, "alert:"+alertDto.Fingerprint, string(json), 5*time.Minute).Result()
+	_, redisErr := r.client.Set(ctx, "alert:"+alertDto.Fingerprint, string(json), 15*time.Minute).Result()
 
 	if redisErr != nil {
 		return redisErr
+	}
+
+	return nil
+
+}
+
+func (r *AlertCache) DeleteByKey(ctx context.Context, alert domain.Alert) error {
+
+	key := fmt.Sprintf("alert:%s", alert.Fingerprint)
+
+	err := r.client.Del(ctx, key).Err()
+
+	if err != nil {
+		return err
 	}
 
 	return nil

@@ -9,4 +9,5 @@ type AlertCacheDto struct {
 	StartsAt    time.Time
 	AlertName   string
 	Status      string
+	Severity    string
 }

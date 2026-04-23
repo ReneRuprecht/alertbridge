@@ -9,4 +9,5 @@ type alertDto struct {
 	StartsAt    time.Time `json:"starts_at"`
 	AlertName   string    `json:"alert_name"`
 	Status      string    `json:"status"`
+	Severity    string    `json:"severity"`
 }

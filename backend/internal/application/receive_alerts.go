@@ -29,6 +29,11 @@ func (uc *ReceiveAlertUsecase) Execute(ctx context.Context, alerts []domain.Aler
 		}
 
 		if alert.Status == "resolved" {
+			err := uc.cache.DeleteByKey(ctx, alert)
+
+			if err != nil {
+				return err
+			}
 			continue
 		}
 

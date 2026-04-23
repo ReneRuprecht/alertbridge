@@ -13,6 +13,7 @@ type ActiveAlert struct {
 	Instance    string    `json:"instance"`
 	Job         string    `json:"job"`
 	Status      string    `json:"status"`
+	Severity    string    `json:"severity"`
 	StartsAt    time.Time `json:"startsAt"`
 	AlertName   string    `json:"alertName"`
 }
