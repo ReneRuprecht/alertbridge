@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router';
 import type { Alert } from '../types/Alert';
-import { formatAlertInstance, formatAlertStatus, formatAlertTime } from '../utils/Formatter';
+import { formatAlertInstance, formatAlertTime, getSeverityStyle } from '../utils/Formatter';
+import "./ActiveAlertTableItem.css"
 
 interface ActiveAlertItemProps {
     alert: Alert;
@@ -19,7 +20,7 @@ export default function ActiveAlertTableItem({ alert }: ActiveAlertItemProps) {
             <td>{alert.job}</td>
             <td>{formatAlertInstance(alert.instance)}</td>
             <td>{formatAlertTime(alert.startsAt)}</td>
-            <td>{formatAlertStatus(alert.status)}</td>
+            <td className={getSeverityStyle(alert.severity)}>{alert.severity}</td>
             <td></td>
         </tr>
     );

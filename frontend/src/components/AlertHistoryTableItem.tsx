@@ -1,5 +1,5 @@
 import type { HistoryAlert } from '../types/Alert';
-import { formatAlertTime } from '../utils/Formatter';
+import { formatAlertTime, getSeverityStyle } from '../utils/Formatter';
 import "./AlertHistoryTableItem.css"
 
 interface AlertItemProps {
@@ -9,14 +9,14 @@ interface AlertItemProps {
 
 export default function AlertHistoryTableItem({ alert, isActive }: AlertItemProps) {
     return (
-        <tr className={isActive ? "active-row" : ""}>
+        <tr>
             <td>{alert.alertName}</td>
             <td>{alert.job}</td>
-            <td>{alert.severity}</td>
+            <td className={getSeverityStyle(alert.severity)}>{alert.severity}</td>
             <td>{alert.description}</td>
             <td>{formatAlertTime(alert.receivedAt)}</td>
             <td>{formatAlertTime(alert.startsAt)}</td>
-            <td>{alert.status}</td>
+            <td className={isActive ? "firing" : "resolved"}>{alert.status}</td>
         </tr>
     );
 }

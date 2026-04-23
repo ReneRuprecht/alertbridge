@@ -4,6 +4,7 @@ export interface Alert {
   instance: string;
   job: string;
   status: "firing" | "resolved";
+  severity: string;
   startsAt: string;
 }
 

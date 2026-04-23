@@ -32,3 +32,14 @@ export function formatAlertStatus(status: string | undefined): string {
       return "unknown";
   }
 }
+
+export function getSeverityStyle(severity: string): string {
+  switch (severity.toLowerCase()) {
+    case "critical":
+      return "alert-critical";
+    case "warning":
+      return "alert-warning";
+    default:
+      return "";
+  }
+}

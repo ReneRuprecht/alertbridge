@@ -1,3 +1,14 @@
-.active-row {
-    background-color: red
+.firing {
+    color: red
+}
+.resolved {
+    color: green
+}
+
+.critical {
+    color: red;
+}
+
+.warning {
+    color: yellow;
 }

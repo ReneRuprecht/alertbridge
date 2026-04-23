@@ -47,11 +47,11 @@ export default function ActiveAlertTable() {
                         <th>Job</th>
                         <th>Instance</th>
                         <th>Angefangen</th>
-                        <th>Status</th>
+                        <th>Schweregrad</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {alerts.map((alert) => (
+                    {alerts.filter((alert: Alert) => alert.status !== "resolved").map((alert: Alert) => (
                         <ActiveAlertTableItem key={alert.fingerprint} alert={alert} />
                     ))}
                 </tbody>
