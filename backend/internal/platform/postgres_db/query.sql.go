@@ -8,6 +8,8 @@ package postgres_db
 import (
 	"context"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 const findAlertsByInstance = `-- name: FindAlertsByInstance :many
@@ -81,4 +83,58 @@ func (q *Queries) InsertAlert(ctx context.Context, arg InsertAlertParams) error 
 		arg.Annotations,
 	)
 	return err
+}
+
+const insertRule = `-- name: InsertRule :exec
+INSERT INTO rules (id, name, description, priority, enabled)
+VALUES ($1, $2, $3, $4, $5)
+`
+
+type InsertRuleParams struct {
+	ID          uuid.UUID
+	Name        string
+	Description string
+	Priority    int32
+	Enabled     bool
+}
+
+func (q *Queries) InsertRule(ctx context.Context, arg InsertRuleParams) error {
+	_, err := q.db.Exec(ctx, insertRule,
+		arg.ID,
+		arg.Name,
+		arg.Description,
+		arg.Priority,
+		arg.Enabled,
+	)
+	return err
+}
+
+const listRules = `-- name: ListRules :many
+SELECT id, name, description, priority, enabled from rules
+`
+
+func (q *Queries) ListRules(ctx context.Context) ([]Rule, error) {
+	rows, err := q.db.Query(ctx, listRules)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Rule
+	for rows.Next() {
+		var i Rule
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Description,
+			&i.Priority,
+			&i.Enabled,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

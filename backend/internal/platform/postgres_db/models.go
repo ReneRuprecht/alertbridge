@@ -7,11 +7,11 @@ package postgres_db
 import (
 	"time"
 
-	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/google/uuid"
 )
 
 type Alert struct {
-	ID          pgtype.UUID
+	ID          uuid.UUID
 	Fingerprint string
 	Instance    string
 	Status      string
@@ -19,4 +19,12 @@ type Alert struct {
 	ReceivedAt  time.Time
 	Labels      map[string]string
 	Annotations map[string]string
+}
+
+type Rule struct {
+	ID          uuid.UUID
+	Name        string
+	Description string
+	Priority    int32
+	Enabled     bool
 }

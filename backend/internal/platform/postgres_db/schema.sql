@@ -13,3 +13,11 @@ CREATE TABLE alerts (
 
 ALTER TABLE alerts
 ADD CONSTRAINT unique_alert UNIQUE(fingerprint, status, starts_at);
+
+CREATE TABLE rules (
+    id UUID PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL,
+    description TEXT NOT NULL,
+    priority INTEGER NOT NULL,
+    enabled BOOLEAN NOT NULL
+);
