@@ -61,6 +61,7 @@ func (suite *AlertCacheTestSuite) TestAlertCache_Save() {
 	labels := make(map[string]string)
 	labels["instance"] = "testinstance"
 	labels["alertname"] = "testalert"
+	labels["severity"] = "critical"
 
 	alert := domain.Alert{Fingerprint: fp, Status: status, StartAt: startsAt, Labels: labels}
 
@@ -75,6 +76,7 @@ func (suite *AlertCacheTestSuite) TestAlertCache_Save() {
 	suite.Assert().Contains(res, "firing")
 	suite.Assert().Contains(res, "testinstance")
 	suite.Assert().Contains(res, "testalert")
+	suite.Assert().Contains(res, "critical")
 }
 
 func (suite *AlertCacheTestSuite) TestAlertCache_ListAlerts() {
