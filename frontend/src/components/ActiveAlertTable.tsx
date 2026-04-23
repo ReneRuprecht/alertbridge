@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { getActiveAlerts } from '../api/GetActiveAlerts';
 import ActiveAlertTableItem from './ActiveAlertTableItem';
 import type { ActiveAlerts, Alert } from '../types/Alert';
+import "./ActiveAlertTable.css"
 
 export default function ActiveAlertTable() {
     const [alerts, setAlerts] = useState<Alert[]>([]);
@@ -38,21 +39,23 @@ export default function ActiveAlertTable() {
     if (alerts === undefined || alerts.length === 0) return <h1>Keine Alerts</h1>;
 
     return (
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Job</th>
-                    <th>Instance</th>
-                    <th>Angefangen</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                {alerts.map((alert) => (
-                    <ActiveAlertTableItem key={alert.fingerprint} alert={alert} />
-                ))}
-            </tbody>
-        </table>
+        <div className='active-alerts-table-wrapper'>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Job</th>
+                        <th>Instance</th>
+                        <th>Angefangen</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {alerts.map((alert) => (
+                        <ActiveAlertTableItem key={alert.fingerprint} alert={alert} />
+                    ))}
+                </tbody>
+            </table>
+        </div>
     );
 }
