@@ -10,13 +10,8 @@ import (
 	"github.com/jackc/pgx/v5"
 	r "github.com/redis/go-redis/v9"
 	"github.com/reneruprecht/alertbridge/backend/internal/alert"
-	httpListActiveAlerts "github.com/reneruprecht/alertbridge/backend/internal/alert/adapters/http/alert/list_active_alerts"
-	httpListAlertsByInstance "github.com/reneruprecht/alertbridge/backend/internal/alert/adapters/http/alert/list_alerts_by_instance"
-	alertHttpAlertmanager "github.com/reneruprecht/alertbridge/backend/internal/alert/adapters/http/alertmanager"
 	"github.com/reneruprecht/alertbridge/backend/internal/platform/postgres_db"
 	"github.com/reneruprecht/alertbridge/backend/internal/rule"
-	httpCreateRule "github.com/reneruprecht/alertbridge/backend/internal/rule/adapters/http/rule/create_rule"
-	httpListRules "github.com/reneruprecht/alertbridge/backend/internal/rule/adapters/http/rule/list_rules"
 )
 
 type config struct {
@@ -55,21 +50,6 @@ func setupRedisClient(cfg config) (*r.Client, error) {
 	client := r.NewClient(opt)
 
 	return client, nil
-}
-
-func registerAlertRoutes(mux *http.ServeMux, alertModule *alert.AlertModule) {
-
-	mux.HandleFunc("POST /api/v1/alertmanager", alertHttpAlertmanager.HandleWebhook(alertModule.SaveAlertsWithCache))
-
-	mux.HandleFunc("GET /api/v1/alerts/{instance}", httpListAlertsByInstance.HandleListAlertsByInstance(alertModule.ListAlertsByInstance))
-	mux.HandleFunc("GET /api/v1/alerts", httpListActiveAlerts.HandleListActiveAlerts(alertModule.ListActiveAlerts))
-
-}
-
-func registerRuleRoutes(mux *http.ServeMux, ruleModule *rule.RuleModule) {
-
-	mux.HandleFunc("POST /api/v1/rules", httpCreateRule.HandleCreateRule(ruleModule.CreateRule))
-	mux.HandleFunc("GET /api/v1/rules", httpListRules.HandleListRules(ruleModule.ListRules))
 }
 
 func startServer(mux *http.ServeMux, cfg config) {
@@ -113,8 +93,8 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	registerAlertRoutes(mux, alertModule)
-	registerRuleRoutes(mux, ruleModule)
+	alertModule.RegisterAlertRoutes(mux)
+	ruleModule.RegisterRuleRoutes(mux)
 
 	startServer(mux, cfg)
 
