@@ -2,72 +2,120 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/jackc/pgx/v5"
 	r "github.com/redis/go-redis/v9"
+	"github.com/reneruprecht/alertbridge/backend/internal/alert"
 	httpListActiveAlerts "github.com/reneruprecht/alertbridge/backend/internal/alert/adapters/http/alert/list_active_alerts"
 	httpListAlertsByInstance "github.com/reneruprecht/alertbridge/backend/internal/alert/adapters/http/alert/list_alerts_by_instance"
 	alertHttpAlertmanager "github.com/reneruprecht/alertbridge/backend/internal/alert/adapters/http/alertmanager"
-	alertPostgres "github.com/reneruprecht/alertbridge/backend/internal/alert/adapters/postgres"
-	alertRedis "github.com/reneruprecht/alertbridge/backend/internal/alert/adapters/redis"
-	alertApplication "github.com/reneruprecht/alertbridge/backend/internal/alert/application"
 	"github.com/reneruprecht/alertbridge/backend/internal/platform/postgres_db"
+	"github.com/reneruprecht/alertbridge/backend/internal/rule"
 	httpCreateRule "github.com/reneruprecht/alertbridge/backend/internal/rule/adapters/http/rule/create_rule"
 	httpListRules "github.com/reneruprecht/alertbridge/backend/internal/rule/adapters/http/rule/list_rules"
-	rulePostgres "github.com/reneruprecht/alertbridge/backend/internal/rule/adapters/postgres"
-	ruleApplication "github.com/reneruprecht/alertbridge/backend/internal/rule/application"
 )
+
+type config struct {
+	PostgresConnStr string
+	RedisConnStr    string
+	Port            string
+}
+
+func loadConfig() config {
+
+	postgresConnStr := os.Getenv("AB_POSTGRES_CONNSTR")
+	if postgresConnStr == "" {
+		postgresConnStr = "postgres://postgres:postgres@localhost:5432/alerts?sslmode=disable"
+	}
+
+	redisConnStr := os.Getenv("AB_REDIS_CONNSTR")
+	if redisConnStr == "" {
+		redisConnStr = "redis://:@localhost:6379/0"
+	}
+	serverPort := os.Getenv("AB_SERVER_PORT")
+	if serverPort == "" {
+		serverPort = "8080"
+	}
+
+	return config{PostgresConnStr: postgresConnStr, RedisConnStr: redisConnStr, Port: serverPort}
+
+}
+
+func setupRedisClient(cfg config) (*r.Client, error) {
+	opt, err := r.ParseURL(cfg.RedisConnStr)
+
+	if err != nil {
+		return nil, err
+	}
+
+	client := r.NewClient(opt)
+
+	return client, nil
+}
+
+func registerAlertRoutes(mux *http.ServeMux, alertModule *alert.AlertModule) {
+
+	mux.HandleFunc("POST /api/v1/alertmanager", alertHttpAlertmanager.HandleWebhook(alertModule.SaveAlertsWithCache))
+
+	mux.HandleFunc("GET /api/v1/alerts/{instance}", httpListAlertsByInstance.HandleListAlertsByInstance(alertModule.ListAlertsByInstance))
+	mux.HandleFunc("GET /api/v1/alerts", httpListActiveAlerts.HandleListActiveAlerts(alertModule.ListActiveAlerts))
+
+}
+
+func registerRuleRoutes(mux *http.ServeMux, ruleModule *rule.RuleModule) {
+
+	mux.HandleFunc("POST /api/v1/rules", httpCreateRule.HandleCreateRule(ruleModule.CreateRule))
+	mux.HandleFunc("GET /api/v1/rules", httpListRules.HandleListRules(ruleModule.ListRules))
+}
+
+func startServer(mux *http.ServeMux, cfg config) {
+
+	serverPort := os.Getenv("AB_SERVER_PORT")
+	if serverPort == "" {
+		serverPort = "8080"
+	}
+	log.Printf("Server running on :%s\n", serverPort)
+	serverError := http.ListenAndServe(fmt.Sprintf(":%s", serverPort), mux)
+
+	if serverError != nil {
+		log.Fatal(serverError)
+	}
+}
 
 func main() {
 
 	ctx := context.Background()
 
-	connStr := "postgres://postgres:postgres@localhost:5432/alerts?sslmode=disable"
-	conn, err := pgx.Connect(ctx, connStr)
+	cfg := loadConfig()
 
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer conn.Close(ctx)
-
-	queries := postgres_db.New(conn)
-
-	repo := alertPostgres.NewAlertRepository(queries)
-	ruleRepo := rulePostgres.NewRuleRepository(queries)
-
-	opt, err := r.ParseURL("redis://:@localhost:6379/0")
+	postgresConn, err := pgx.Connect(ctx, cfg.PostgresConnStr)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	client := r.NewClient(opt)
+	defer postgresConn.Close(ctx)
 
-	cache := alertRedis.NewAlertCache(client)
+	queries := postgres_db.New(postgresConn)
 
-	saveAlertsWithCacheUseCase := alertApplication.NewSaveAlertsWithCacheUseCase(repo, cache)
-	listAlertsByInstance := alertApplication.NewListAlertsByInstanceUseCase(repo)
-	listActiveAlertsUseCase := alertApplication.NewListActiveAlertsUseCase(cache)
+	redisClient, err := setupRedisClient(cfg)
 
-	createRuleUseCase := ruleApplication.NewCreateRuleUseCase(ruleRepo)
-	listRuleUseCase := ruleApplication.NewListRuleUseCase(ruleRepo)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	alertModule := alert.NewAlertModule(queries, redisClient)
+	ruleModule := rule.NewRuleModule(queries)
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("POST /api/v1/alertmanager", alertHttpAlertmanager.HandleWebhook(saveAlertsWithCacheUseCase))
+	registerAlertRoutes(mux, alertModule)
+	registerRuleRoutes(mux, ruleModule)
 
-	mux.HandleFunc("GET /api/v1/alerts/{instance}", httpListAlertsByInstance.HandleListAlertsByInstance(listAlertsByInstance))
-	mux.HandleFunc("GET /api/v1/alerts", httpListActiveAlerts.HandleListActiveAlerts(listActiveAlertsUseCase))
+	startServer(mux, cfg)
 
-	mux.HandleFunc("POST /api/v1/rules", httpCreateRule.HandleCreateRule(createRuleUseCase))
-	mux.HandleFunc("GET /api/v1/rules", httpListRules.HandleListRules(listRuleUseCase))
-
-	log.Println("Server running on :8080")
-	serverError := http.ListenAndServe(":8080", mux)
-
-	if serverError != nil {
-		log.Fatal(serverError)
-	}
 }
