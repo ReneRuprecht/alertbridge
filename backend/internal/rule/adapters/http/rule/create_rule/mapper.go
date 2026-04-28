@@ -4,7 +4,12 @@ import "github.com/reneruprecht/alertbridge/backend/internal/rule/domain"
 
 func toDomain(request CreateRuleRequest) (domain.Rule, error) {
 
-	id := domain.NewRuleId()
+	id, err := domain.NewRuleId()
+
+	if err != nil {
+		return domain.Rule{}, err
+	}
+
 	name, err := domain.NewRuleName(request.Name)
 
 	if err != nil {
@@ -25,3 +30,4 @@ func toDomain(request CreateRuleRequest) (domain.Rule, error) {
 		Enabled:     request.Enabled,
 	}, nil
 }
+

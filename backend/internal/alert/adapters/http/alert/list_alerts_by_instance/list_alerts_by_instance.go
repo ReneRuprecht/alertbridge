@@ -7,13 +7,9 @@ import (
 	"github.com/reneruprecht/alertbridge/backend/internal/alert/application"
 )
 
-func HandleFindAlertsByInstance(uc application.FindAlertsByInstanceUseCaseInterface) http.HandlerFunc {
+func HandleListAlertsByInstance(uc application.ListAlertsByInstanceUseCase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		enableCors(w)
-		if r.Method != http.MethodGet {
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-			return
-		}
 
 		instance := r.PathValue("instance")
 		if instance == "" {
@@ -28,7 +24,7 @@ func HandleFindAlertsByInstance(uc application.FindAlertsByInstanceUseCaseInterf
 			return
 		}
 
-		dto := toFindAlertsByInstanceDto(alerts, instance)
-		json.NewEncoder(w).Encode(dto)
+		response := toListAlertsByInstanceResponse(alerts, instance)
+		json.NewEncoder(w).Encode(response)
 	}
 }

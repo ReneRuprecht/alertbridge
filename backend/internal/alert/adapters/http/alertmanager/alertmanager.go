@@ -8,12 +8,8 @@ import (
 	"github.com/reneruprecht/alertbridge/backend/internal/alert/application"
 )
 
-func HandleWebhook(uc application.ReceiveAlertUsecaseInterface) http.HandlerFunc {
+func HandleWebhook(uc application.SaveAlertsWithCacheUseCase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-			return
-		}
 		var req WebhookRequest
 
 		err := json.NewDecoder(r.Body).Decode(&req)

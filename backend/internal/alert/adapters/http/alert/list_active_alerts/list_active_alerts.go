@@ -1,25 +1,25 @@
-package rule
+package alert
 
 import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/reneruprecht/alertbridge/backend/internal/rule/application"
+	"github.com/reneruprecht/alertbridge/backend/internal/alert/application"
 )
 
-func HandleListRules(uc application.ListRulesUseCaseInterface) http.HandlerFunc {
+func HandleListActiveAlerts(uc application.ListActiveAlertsUseCase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		enableCors(w)
 
 		ctx := r.Context()
-		rules, err := uc.Execute(ctx)
+		alerts, err := uc.Execute(ctx)
 
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		dto := toListRulesDto(rules)
+		dto := toListActiveAlertDto(alerts)
 		json.NewEncoder(w).Encode(dto)
 	}
 }

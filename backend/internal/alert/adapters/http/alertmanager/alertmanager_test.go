@@ -66,21 +66,6 @@ func TestHandleWebhook_InvalidJSON(t *testing.T) {
 	}
 }
 
-func TestHandleWebhook_MethodNotAllowed(t *testing.T) {
-	req := httptest.NewRequest(http.MethodGet, webhook_url, nil)
-	w := httptest.NewRecorder()
-
-	uc := &mockUseCase{
-		err: nil,
-	}
-	handler := alertmanager.HandleWebhook(uc)
-	handler.ServeHTTP(w, req)
-
-	if w.Code != http.StatusMethodNotAllowed {
-		t.Fatalf("expected 405, got %d", w.Code)
-	}
-}
-
 func TestHandleWebhook_InvalidRequest(t *testing.T) {
 	body := `{
         "alerts": [{

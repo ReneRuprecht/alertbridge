@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-type AlertDto struct {
+type alertRepositoryEntity struct {
 	Fingerprint string
 	Instance    string
 	Status      string

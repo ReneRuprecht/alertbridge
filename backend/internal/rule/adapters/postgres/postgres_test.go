@@ -75,10 +75,10 @@ func (suite *RuleRepositoryTestSuite) SetupTest() {
 
 func (suite *RuleRepositoryTestSuite) TestRuleRepository_SaveOne() {
 
-	id := domain.NewRuleId()
+	id, _ := domain.NewRuleId()
 	name, _ := domain.NewRuleName("testName")
 	description := "testDesc"
-	priority,_ := domain.NewRulePriority(100)
+	priority, _ := domain.NewRulePriority(100)
 	enabled := true
 
 	rule := domain.Rule{
@@ -101,10 +101,10 @@ func (suite *RuleRepositoryTestSuite) TestRuleRepository_SaveOne() {
 
 func (suite *RuleRepositoryTestSuite) TestRuleRepository_List() {
 
-	id := domain.NewRuleId()
+	id, _ := domain.NewRuleId()
 	name, _ := domain.NewRuleName("testName")
 	description := "testDesc"
-	priority,_ := domain.NewRulePriority(100)
+	priority, _ := domain.NewRulePriority(100)
 	enabled := true
 
 	rule := domain.Rule{

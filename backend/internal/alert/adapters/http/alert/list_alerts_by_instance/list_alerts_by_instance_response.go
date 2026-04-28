@@ -13,7 +13,7 @@ type AlertHistory struct {
 	ReceivedAt  time.Time `json:"receivedAt"`
 }
 
-type FindAlertsByInstanceDto struct {
+type listAlertsByInstanceResponse struct {
 	Instance string         `json:"instance"`
 	Alerts   []AlertHistory `json:"alerts"`
 }

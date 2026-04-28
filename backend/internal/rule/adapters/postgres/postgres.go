@@ -17,14 +17,14 @@ func NewRuleRepository(queries *postgres_db.Queries) *RuleRepository {
 
 func (r *RuleRepository) Save(ctx context.Context, rule domain.Rule) error {
 
-	ruleDto := toDbRule(rule)
+	ruleEntity := toRuleRepositoryEntity(rule)
 
 	return r.queries.InsertRule(ctx, postgres_db.InsertRuleParams{
-		ID:          ruleDto.ID,
-		Name:        ruleDto.Name,
-		Description: ruleDto.Description,
-		Priority:    ruleDto.Priority,
-		Enabled:     ruleDto.Enabled,
+		ID:          ruleEntity.ID,
+		Name:        ruleEntity.Name,
+		Description: ruleEntity.Description,
+		Priority:    ruleEntity.Priority,
+		Enabled:     ruleEntity.Enabled,
 	})
 }
 

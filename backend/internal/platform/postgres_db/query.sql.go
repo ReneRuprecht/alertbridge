@@ -12,50 +12,6 @@ import (
 	"github.com/google/uuid"
 )
 
-const findAlertsByInstance = `-- name: FindAlertsByInstance :many
-SELECT fingerprint, instance, status, starts_at, received_at, labels, annotations FROM alerts 
-WHERE instance=$1
-ORDER BY received_at DESC
-`
-
-type FindAlertsByInstanceRow struct {
-	Fingerprint string
-	Instance    string
-	Status      string
-	StartsAt    time.Time
-	ReceivedAt  time.Time
-	Labels      map[string]string
-	Annotations map[string]string
-}
-
-func (q *Queries) FindAlertsByInstance(ctx context.Context, instance string) ([]FindAlertsByInstanceRow, error) {
-	rows, err := q.db.Query(ctx, findAlertsByInstance, instance)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []FindAlertsByInstanceRow
-	for rows.Next() {
-		var i FindAlertsByInstanceRow
-		if err := rows.Scan(
-			&i.Fingerprint,
-			&i.Instance,
-			&i.Status,
-			&i.StartsAt,
-			&i.ReceivedAt,
-			&i.Labels,
-			&i.Annotations,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const insertAlert = `-- name: InsertAlert :exec
 INSERT INTO alerts (fingerprint, instance, status, starts_at, received_at, labels, annotations)
 VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -107,6 +63,50 @@ func (q *Queries) InsertRule(ctx context.Context, arg InsertRuleParams) error {
 		arg.Enabled,
 	)
 	return err
+}
+
+const listAlertsByInstance = `-- name: ListAlertsByInstance :many
+SELECT fingerprint, instance, status, starts_at, received_at, labels, annotations FROM alerts 
+WHERE instance=$1
+ORDER BY received_at DESC
+`
+
+type ListAlertsByInstanceRow struct {
+	Fingerprint string
+	Instance    string
+	Status      string
+	StartsAt    time.Time
+	ReceivedAt  time.Time
+	Labels      map[string]string
+	Annotations map[string]string
+}
+
+func (q *Queries) ListAlertsByInstance(ctx context.Context, instance string) ([]ListAlertsByInstanceRow, error) {
+	rows, err := q.db.Query(ctx, listAlertsByInstance, instance)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListAlertsByInstanceRow
+	for rows.Next() {
+		var i ListAlertsByInstanceRow
+		if err := rows.Scan(
+			&i.Fingerprint,
+			&i.Instance,
+			&i.Status,
+			&i.StartsAt,
+			&i.ReceivedAt,
+			&i.Labels,
+			&i.Annotations,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const listRules = `-- name: ListRules :many

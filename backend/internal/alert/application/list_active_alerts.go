@@ -2,28 +2,20 @@ package application
 
 import (
 	"context"
-	"log"
 )
 
-type ListActiveAlertsUseCaseInterface interface {
-	Execute([]AlertCacheDto, error)
+type ListActiveAlertsUseCase interface {
+	Execute(ctx context.Context) ([]AlertCacheDto, error)
 }
 
-type ListActiveAlertsUseCase struct {
+type listActiveAlertsUseCase struct {
 	cache AlertCacheReader
 }
 
-func NewListActiveAlertsUseCase(cache AlertCacheReader) *ListActiveAlertsUseCase {
-	return &ListActiveAlertsUseCase{cache: cache}
+func NewListActiveAlertsUseCase(cache AlertCacheReader) *listActiveAlertsUseCase {
+	return &listActiveAlertsUseCase{cache: cache}
 }
 
-func (uc *ListActiveAlertsUseCase) Execute(ctx context.Context) ([]AlertCacheDto, error) {
-
-	alerts, err := uc.cache.ListAlerts(ctx)
-
-	if err != nil {
-		log.Printf("FindAlertsByInstanceUseCase error %v", err)
-		return nil, err
-	}
-	return alerts, nil
+func (uc *listActiveAlertsUseCase) Execute(ctx context.Context) ([]AlertCacheDto, error) {
+	return uc.cache.List(ctx)
 }

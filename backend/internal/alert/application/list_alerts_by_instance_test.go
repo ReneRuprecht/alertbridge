@@ -11,26 +11,26 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type mockRepo struct {
+type mockAlertRepoReader struct {
 	err    error
 	alerts []domain.Alert
 }
 
-func (m *mockRepo) FindAlertsByInstance(context context.Context, instance string) ([]domain.Alert, error) {
+func (m *mockAlertRepoReader) ListByInstance(context context.Context, instance string) ([]domain.Alert, error) {
 	return m.alerts, m.err
 }
 
-func TestFindAlertsByInstanceUseCase_Valid(t *testing.T) {
+func TestListAlertsByInstance_Valid(t *testing.T) {
 	fp, _ := domain.NewFingerprint("fp1")
 	status, _ := domain.NewStatus("firing")
 	startAt, _ := domain.NewTimestamp(time.Now().Format(time.RFC3339))
 	receivedAt, _ := domain.NewTimestamp(time.Now().Format(time.RFC3339))
 
-	repo := &mockRepo{
+	repo := &mockAlertRepoReader{
 		alerts: []domain.Alert{domain.Alert{Fingerprint: fp, Status: status, StartAt: startAt, ReceivedAt: receivedAt}},
 		err:    nil,
 	}
-	uc := application.NewFindAlertsByInstanceUseCase(repo)
+	uc := application.NewListAlertsByInstanceUseCase(repo)
 
 	ctx := context.Background()
 	alerts, err := uc.Execute(ctx, "test")
@@ -43,12 +43,12 @@ func TestFindAlertsByInstanceUseCase_Valid(t *testing.T) {
 
 }
 
-func TestFindAlertsByInstanceUseCase_Error(t *testing.T) {
-	repo := &mockRepo{
+func TestListAlertsByInstance_Error(t *testing.T) {
+	repo := &mockAlertRepoReader{
 		alerts: []domain.Alert{},
 		err:    errors.New("db down"),
 	}
-	uc := application.NewFindAlertsByInstanceUseCase(repo)
+	uc := application.NewListAlertsByInstanceUseCase(repo)
 
 	ctx := context.Background()
 	_, err := uc.Execute(ctx, "test")

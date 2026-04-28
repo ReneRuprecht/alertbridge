@@ -3,7 +3,6 @@ package redis
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -19,7 +18,7 @@ func NewAlertCache(client *redis.Client) *AlertCache {
 	return &AlertCache{client: client}
 }
 
-func (r *AlertCache) ListAlerts(ctx context.Context) ([]application.AlertCacheDto, error) {
+func (r *AlertCache) List(ctx context.Context) ([]application.AlertCacheDto, error) {
 
 	var cursor uint64
 	var alerts []application.AlertCacheDto
@@ -40,7 +39,7 @@ func (r *AlertCache) ListAlerts(ctx context.Context) ([]application.AlertCacheDt
 
 		for _, cmd := range cmds {
 			val, _ := cmd.Result()
-			var a alertDto
+			var a alertCacheEntity
 			err := json.Unmarshal([]byte(val), &a)
 			if err != nil {
 				return nil, err
@@ -59,17 +58,17 @@ func (r *AlertCache) ListAlerts(ctx context.Context) ([]application.AlertCacheDt
 
 }
 
-func (r *AlertCache) Save(ctx context.Context, alert domain.Alert) error {
+func (r *AlertCache) Save(ctx context.Context, key string, alert domain.Alert) error {
 
-	alertDto := toDto(alert)
+	entity := toAlertCacheEntity(alert)
 
-	json, err := json.Marshal(alertDto)
+	json, err := json.Marshal(entity)
 
 	if err != nil {
 		return err
 	}
 
-	_, redisErr := r.client.Set(ctx, "alert:"+alertDto.Fingerprint, string(json), 15*time.Minute).Result()
+	_, redisErr := r.client.Set(ctx, key, string(json), 15*time.Minute).Result()
 
 	if redisErr != nil {
 		return redisErr
@@ -79,9 +78,7 @@ func (r *AlertCache) Save(ctx context.Context, alert domain.Alert) error {
 
 }
 
-func (r *AlertCache) DeleteByKey(ctx context.Context, alert domain.Alert) error {
-
-	key := fmt.Sprintf("alert:%s", alert.Fingerprint)
+func (r *AlertCache) DeleteByKey(ctx context.Context, key string) error {
 
 	err := r.client.Del(ctx, key).Err()
 

@@ -14,7 +14,7 @@ type mockCacheReader struct {
 	alerts []application.AlertCacheDto
 }
 
-func (m *mockCacheReader) ListAlerts(context context.Context) ([]application.AlertCacheDto, error) {
+func (m *mockCacheReader) List(context context.Context) ([]application.AlertCacheDto, error) {
 	return m.alerts, m.err
 }
 

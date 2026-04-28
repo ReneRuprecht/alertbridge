@@ -137,7 +137,7 @@ func (suite *AlertRepositoryTestSuite) TestAlertRepository_SaveMany() {
 
 }
 
-func (suite *AlertRepositoryTestSuite) TestAlertRepository_FindAlertsByInstance() {
+func (suite *AlertRepositoryTestSuite) TestAlertRepository_ListAlertsByInstance() {
 
 	fp, _ := domain.NewFingerprint("x123")
 	status, _ := domain.NewStatus("firing")
@@ -153,7 +153,7 @@ func (suite *AlertRepositoryTestSuite) TestAlertRepository_FindAlertsByInstance(
 	repoError := suite.repo.Save(ctx, alert)
 	suite.Require().NoError(repoError)
 
-	alerts, err := suite.repo.FindAlertsByInstance(suite.ctx, "testinstance")
+	alerts, err := suite.repo.ListByInstance(suite.ctx, "testinstance")
 
 	suite.Require().NoError(err)
 	suite.Assert().Equal(1, len(alerts))

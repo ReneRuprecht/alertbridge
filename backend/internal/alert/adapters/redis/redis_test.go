@@ -4,6 +4,7 @@ package redis_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -69,10 +70,12 @@ func (suite *AlertCacheTestSuite) TestAlertCache_Save() {
 
 	alert := domain.Alert{Fingerprint: fp, Status: status, StartAt: startsAt, Labels: labels}
 
+	key := fmt.Sprintf("alert:%s", alert.Fingerprint)
+
 	ctx, cancel := testContext(suite.T())
 	defer cancel()
 
-	cacheError := suite.cache.Save(ctx, alert)
+	cacheError := suite.cache.Save(ctx, key, alert)
 	suite.Require().NoError(cacheError)
 
 	res, err := suite.client.Get(suite.ctx, "alert:x123").Result()
@@ -100,10 +103,11 @@ func (suite *AlertCacheTestSuite) TestAlertCache_ListAlerts() {
 	ctx, cancel := testContext(suite.T())
 	defer cancel()
 
-	cacheError := suite.cache.Save(ctx, alert)
+	key := fmt.Sprintf("alert:%s", alert.Fingerprint)
+	cacheError := suite.cache.Save(ctx, key, alert)
 	suite.Require().NoError(cacheError)
 
-	res, err := suite.cache.ListAlerts(suite.ctx)
+	res, err := suite.cache.List(suite.ctx)
 	suite.Require().NoError(err)
 
 	suite.Equal(1, len(res))

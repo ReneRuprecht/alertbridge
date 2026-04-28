@@ -2,7 +2,7 @@ package redis
 
 import "time"
 
-type alertDto struct {
+type alertCacheEntity struct {
 	Fingerprint string    `json:"fingerprint"`
 	Instance    string    `json:"instance"`
 	Job         string    `json:"job"`

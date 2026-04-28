@@ -9,7 +9,7 @@ import (
 	"github.com/reneruprecht/alertbridge/backend/internal/platform/postgres_db"
 )
 
-func toDto(alert domain.Alert) AlertDto {
+func toAlertRepositoryEntity(alert domain.Alert) alertRepositoryEntity {
 
 	instance := "unknown"
 
@@ -18,7 +18,7 @@ func toDto(alert domain.Alert) AlertDto {
 		instance = inst
 	}
 
-	return AlertDto{
+	return alertRepositoryEntity{
 		Fingerprint: string(alert.Fingerprint),
 		Instance:    instance,
 		Status:      string(alert.Status),
@@ -29,7 +29,7 @@ func toDto(alert domain.Alert) AlertDto {
 	}
 }
 
-func toDomain(row postgres_db.FindAlertsByInstanceRow) (domain.Alert, error) {
+func toDomain(row postgres_db.ListAlertsByInstanceRow) (domain.Alert, error) {
 
 	fp, err := domain.NewFingerprint(row.Fingerprint)
 

@@ -30,12 +30,12 @@ func toDomain(rule postgres_db.Rule) (domain.Rule, error) {
 
 }
 
-func toDbRule(r domain.Rule) postgres_db.Rule {
+func toRuleRepositoryEntity(r domain.Rule) postgres_db.Rule {
 	return postgres_db.Rule{
 		ID:          uuid.UUID(r.ID),
-		Name:        string(r.Name),
+		Name:        r.Name.String(),
 		Description: r.Description,
-		Priority:    int32(r.Priority),
+		Priority:    int32(r.Priority.Int()),
 		Enabled:     r.Enabled,
 	}
 }

@@ -7,7 +7,7 @@ import (
 	"github.com/reneruprecht/alertbridge/backend/internal/alert/domain"
 )
 
-func toDto(alert domain.Alert) alertDto {
+func toAlertCacheEntity(alert domain.Alert) alertCacheEntity {
 
 	instance := "unknown"
 
@@ -33,7 +33,7 @@ func toDto(alert domain.Alert) alertDto {
 		severity = "unknown"
 	}
 
-	return alertDto{
+	return alertCacheEntity{
 		Fingerprint: string(alert.Fingerprint),
 		Instance:    instance,
 		Job:         job,
@@ -44,15 +44,15 @@ func toDto(alert domain.Alert) alertDto {
 	}
 }
 
-func toCacheDto(alert alertDto) application.AlertCacheDto {
+func toCacheDto(entity alertCacheEntity) application.AlertCacheDto {
 
 	return application.AlertCacheDto{
-		Fingerprint: alert.Fingerprint,
-		Instance:    alert.Instance,
-		Job:         alert.Job,
-		Status:      alert.Status,
-		StartsAt:    alert.StartsAt,
-		AlertName:   alert.AlertName,
-		Severity:    alert.Severity,
+		Fingerprint: entity.Fingerprint,
+		Instance:    entity.Instance,
+		Job:         entity.Job,
+		Status:      entity.Status,
+		StartsAt:    entity.StartsAt,
+		AlertName:   entity.AlertName,
+		Severity:    entity.Severity,
 	}
 }

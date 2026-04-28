@@ -9,7 +9,7 @@ import (
 	"github.com/reneruprecht/alertbridge/backend/internal/rule/domain"
 )
 
-func HandleCreateRule(uc application.CreateRuleUseCaseInterface) http.HandlerFunc {
+func HandleCreateRule(uc application.CreateRuleUseCase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		enableCors(w)
 

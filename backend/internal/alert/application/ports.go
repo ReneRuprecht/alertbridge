@@ -6,19 +6,19 @@ import (
 	"github.com/reneruprecht/alertbridge/backend/internal/alert/domain"
 )
 
-type AlertSaveRepository interface {
+type AlertRepositoryWriter interface {
 	Save(context context.Context, alert domain.Alert) error
 }
 
-type AlertFindByInstanceRepository interface {
-	FindAlertsByInstance(context context.Context, instance string) ([]domain.Alert, error)
+type AlertRepositoryReader interface {
+	ListByInstance(context context.Context, instance string) ([]domain.Alert, error)
 }
 
 type AlertCacheReader interface {
-	ListAlerts(context context.Context) ([]AlertCacheDto, error)
+	List(context context.Context) ([]AlertCacheDto, error)
 }
 
 type AlertCacheWriter interface {
-	Save(context context.Context, alert domain.Alert) error
-	DeleteByKey(context context.Context, alert domain.Alert) error
+	Save(context context.Context,key string, alert domain.Alert) error
+	DeleteByKey(context context.Context, key string) error
 }

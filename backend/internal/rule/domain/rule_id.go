@@ -4,11 +4,15 @@ import "github.com/google/uuid"
 
 type RuleId uuid.UUID
 
-func NewRuleId() RuleId {
+func NewRuleId() (RuleId, error) {
 
-	id, _ := uuid.NewV7()
+	id, err := uuid.NewV7()
 
-	return RuleId(id)
+	if err != nil {
+		return RuleId{}, err
+	}
+
+	return RuleId(id), nil
 }
 func (r RuleId) String() string {
 	return uuid.UUID(r).String()

@@ -2,9 +2,9 @@ package rule
 
 import "github.com/reneruprecht/alertbridge/backend/internal/rule/domain"
 
-func toListRulesDto(rules []domain.Rule) ListRulesResponse {
+func toListRulesResponse(rules []domain.Rule) ListRulesResponse {
 
-	dto := ListRulesResponse{Rules: []Rule{}}
+	response := ListRulesResponse{Rules: []Rule{}}
 
 	for _, rule := range rules {
 
@@ -16,9 +16,9 @@ func toListRulesDto(rules []domain.Rule) ListRulesResponse {
 			Enabled:     rule.Enabled,
 		}
 
-		dto.Rules = append(dto.Rules, r)
+		response.Rules = append(response.Rules, r)
 	}
 
-	return dto
+	return response
 
 }

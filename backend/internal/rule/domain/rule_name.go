@@ -13,3 +13,7 @@ func NewRuleName(name string) (RuleName, error) {
 
 	return RuleName(name), nil
 }
+
+func (r RuleName) String() string {
+	return string(r)
+}

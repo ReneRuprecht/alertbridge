@@ -36,7 +36,7 @@ func TestHandleListRules_OK(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, list_rule_url, nil)
 	w := httptest.NewRecorder()
 
-	id := domain.NewRuleId()
+	id, _ := domain.NewRuleId()
 
 	rules := []domain.Rule{domain.Rule{ID: id, Name: "backend-critical-alerts", Description: "testDesc", Priority: 100, Enabled: true}}
 

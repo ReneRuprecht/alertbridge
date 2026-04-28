@@ -4,9 +4,9 @@ import (
 	"github.com/reneruprecht/alertbridge/backend/internal/alert/domain"
 )
 
-func toFindAlertsByInstanceDto(historyAlerts []domain.Alert, instance string) FindAlertsByInstanceDto {
+func toListAlertsByInstanceResponse(historyAlerts []domain.Alert, instance string) listAlertsByInstanceResponse {
 
-	alerts := FindAlertsByInstanceDto{Alerts: []AlertHistory{}}
+	alerts := listAlertsByInstanceResponse{Alerts: []AlertHistory{}}
 
 	for _, alert := range historyAlerts {
 		severity := alert.Labels["severity"]

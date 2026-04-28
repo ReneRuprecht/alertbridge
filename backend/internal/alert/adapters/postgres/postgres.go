@@ -17,22 +17,22 @@ func NewAlertRepository(queries *postgres_db.Queries) *AlertRepository {
 
 func (r *AlertRepository) Save(ctx context.Context, alert domain.Alert) error {
 
-	alertDto := toDto(alert)
+	alertRepositoryEntity := toAlertRepositoryEntity(alert)
 
 	return r.queries.InsertAlert(ctx, postgres_db.InsertAlertParams{
-		Fingerprint: alertDto.Fingerprint,
-		Instance:    alertDto.Instance,
-		Status:      alertDto.Status,
-		StartsAt:    alertDto.StartsAt,
-		ReceivedAt:  alertDto.ReceivedAt,
-		Labels:      alertDto.Labels,
-		Annotations: alertDto.Annotations,
+		Fingerprint: alertRepositoryEntity.Fingerprint,
+		Instance:    alertRepositoryEntity.Instance,
+		Status:      alertRepositoryEntity.Status,
+		StartsAt:    alertRepositoryEntity.StartsAt,
+		ReceivedAt:  alertRepositoryEntity.ReceivedAt,
+		Labels:      alertRepositoryEntity.Labels,
+		Annotations: alertRepositoryEntity.Annotations,
 	})
 }
 
-func (r *AlertRepository) FindAlertsByInstance(ctx context.Context, instance string) ([]domain.Alert, error) {
+func (r *AlertRepository) ListByInstance(ctx context.Context, instance string) ([]domain.Alert, error) {
 
-	rows, err := r.queries.FindAlertsByInstance(ctx, instance)
+	rows, err := r.queries.ListAlertsByInstance(ctx, instance)
 
 	if err != nil {
 		return nil, err

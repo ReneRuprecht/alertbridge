@@ -11,12 +11,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type mockAlertSaveRepo struct {
+type mockAlertRepositoryWriter struct {
 	err        error
 	saveCalled bool
 }
 
-func (m *mockAlertSaveRepo) Save(context context.Context, alert domain.Alert) error {
+func (m *mockAlertRepositoryWriter) Save(context context.Context, alert domain.Alert) error {
 	m.saveCalled = true
 	return m.err
 }
@@ -27,19 +27,19 @@ type mockAlertCacheWriter struct {
 	deleteCalled bool
 }
 
-func (m *mockAlertCacheWriter) Save(context context.Context, alert domain.Alert) error {
+func (m *mockAlertCacheWriter) Save(context context.Context, key string, alert domain.Alert) error {
 	m.saveCalled = true
 	return m.err
 }
 
-func (m *mockAlertCacheWriter) DeleteByKey(context context.Context, alert domain.Alert) error {
+func (m *mockAlertCacheWriter) DeleteByKey(context context.Context, key string) error {
 	m.deleteCalled = true
 	return m.err
 }
 
-func setupUsecase(repoError error, cacheError error) (*mockAlertSaveRepo, *mockAlertCacheWriter, *application.ReceiveAlertUsecase) {
+func setupUsecase(repoError error, cacheError error) (*mockAlertRepositoryWriter, *mockAlertCacheWriter, application.SaveAlertsWithCacheUseCase) {
 
-	repo := &mockAlertSaveRepo{
+	repo := &mockAlertRepositoryWriter{
 		saveCalled: false,
 		err:        repoError,
 	}
@@ -48,7 +48,7 @@ func setupUsecase(repoError error, cacheError error) (*mockAlertSaveRepo, *mockA
 		deleteCalled: false,
 		err:          cacheError,
 	}
-	uc := application.NewReceiveAlertUseCase(repo, cache)
+	uc := application.NewSaveAlertsWithCacheUseCase(repo, cache)
 
 	return repo, cache, uc
 
@@ -73,7 +73,7 @@ func getResolvedDomainAlerts() []domain.Alert {
 	return data
 }
 
-func TestReceiveUseCase_Valid(t *testing.T) {
+func TestSaveAlertsWithCache_Valid(t *testing.T) {
 
 	repo, cache, uc := setupUsecase(nil, nil)
 
@@ -89,7 +89,7 @@ func TestReceiveUseCase_Valid(t *testing.T) {
 
 }
 
-func TestReceiveUseCase_RepoError(t *testing.T) {
+func TestSaveAlertsWithCache_RepoError(t *testing.T) {
 
 	repo, cache, uc := setupUsecase(errors.New("repo error"), nil)
 
@@ -106,7 +106,7 @@ func TestReceiveUseCase_RepoError(t *testing.T) {
 
 }
 
-func TestReceiveUseCase_CacheSaveError(t *testing.T) {
+func TestSaveAlertsWithCache_CacheSaveError(t *testing.T) {
 
 	repo, cache, uc := setupUsecase(nil, errors.New("cache error"))
 
@@ -123,7 +123,7 @@ func TestReceiveUseCase_CacheSaveError(t *testing.T) {
 
 }
 
-func TestReceiveUseCase_CacheDeleteError(t *testing.T) {
+func TestSaveAlertsWithCache_CacheDeleteError(t *testing.T) {
 
 	repo, cache, uc := setupUsecase(nil, errors.New("cache error"))
 

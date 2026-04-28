@@ -9,7 +9,7 @@ import (
 
 func TestToDomain_Valid(t *testing.T) {
 
-	id := domain.NewRuleId()
+	id, _ := domain.NewRuleId()
 	name, err := domain.NewRuleName("testName")
 	description := "testDesc"
 	priority, _ := domain.NewRulePriority(100)
@@ -17,7 +17,7 @@ func TestToDomain_Valid(t *testing.T) {
 
 	assert.NoError(t, err)
 
-	rule := toDbRule(domain.Rule{ID: id, Name: name, Description: description, Priority: priority, Enabled: enabled})
+	rule := toRuleRepositoryEntity(domain.Rule{ID: id, Name: name, Description: description, Priority: priority, Enabled: enabled})
 
 	domain, err := toDomain(rule)
 
@@ -32,12 +32,12 @@ func TestToDomain_Valid(t *testing.T) {
 
 func TestToDomain_Invalid_Name(t *testing.T) {
 
-	id := domain.NewRuleId()
+	id, _ := domain.NewRuleId()
 	description := "testDesc"
 	priority, _ := domain.NewRulePriority(100)
 	enabled := true
 
-	rule := toDbRule(domain.Rule{ID: id, Name: "", Description: description, Priority: priority, Enabled: enabled})
+	rule := toRuleRepositoryEntity(domain.Rule{ID: id, Name: "", Description: description, Priority: priority, Enabled: enabled})
 
 	_, err := toDomain(rule)
 
