@@ -13,6 +13,16 @@ func HandleCreateRule(uc application.CreateRuleUseCase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		enableCors(w)
 
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		if r.Method != http.MethodPost {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+
 		ctx := r.Context()
 
 		var req CreateRuleRequest

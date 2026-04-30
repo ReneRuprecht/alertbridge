@@ -26,7 +26,7 @@ func NewRuleModule(queries *postgres_db.Queries) *RuleModule {
 
 func (m *RuleModule) RegisterRuleRoutes(mux *http.ServeMux) {
 
-	mux.HandleFunc("POST /api/v1/rules", httpCreateRule.HandleCreateRule(m.CreateRule))
 	mux.HandleFunc("GET /api/v1/rules", httpListRules.HandleListRules(m.ListRules))
+	mux.HandleFunc("/api/v1/rules", httpCreateRule.HandleCreateRule(m.CreateRule))
 
 }
