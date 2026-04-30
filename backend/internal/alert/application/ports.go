@@ -26,3 +26,7 @@ type AlertCacheWriter interface {
 type AlertEventPublisher interface {
 	Publish(context context.Context, alertID domain.Fingerprint) error
 }
+
+type AlertEventConsumer interface {
+	Consume(context context.Context) error
+}
