@@ -12,12 +12,14 @@ import (
 	"github.com/reneruprecht/alertbridge/backend/internal/action"
 	"github.com/reneruprecht/alertbridge/backend/internal/alert"
 	"github.com/reneruprecht/alertbridge/backend/internal/platform/postgres_db"
+	"github.com/reneruprecht/alertbridge/backend/internal/platform/rabbitmq"
 	"github.com/reneruprecht/alertbridge/backend/internal/rule"
 )
 
 type config struct {
 	PostgresConnStr string
 	RedisConnStr    string
+	RabbitMQConnStr string
 	Port            string
 }
 
@@ -32,12 +34,18 @@ func loadConfig() config {
 	if redisConnStr == "" {
 		redisConnStr = "redis://:@localhost:6379/0"
 	}
+
+	rabbitMQConnStr := os.Getenv("AB_RABBITMQ_CONNSTR")
+	if rabbitMQConnStr == "" {
+		rabbitMQConnStr = "amqp://rabbit:rabbit@localhost:5672/"
+	}
+
 	serverPort := os.Getenv("AB_SERVER_PORT")
 	if serverPort == "" {
 		serverPort = "8080"
 	}
 
-	return config{PostgresConnStr: postgresConnStr, RedisConnStr: redisConnStr, Port: serverPort}
+	return config{PostgresConnStr: postgresConnStr, RabbitMQConnStr: rabbitMQConnStr, RedisConnStr: redisConnStr, Port: serverPort}
 
 }
 
@@ -89,7 +97,22 @@ func main() {
 		log.Fatal(err)
 	}
 
-	alertModule := alert.NewAlertModule(queries, redisClient)
+	rabbit, err := rabbitmq.NewRabbit(cfg.RabbitMQConnStr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rabbit.Close()
+
+	alertCh, err := rabbit.Channel()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	alertModule, err := alert.NewAlertModule(queries, redisClient, &alert.RabbitConfig{Channel: alertCh, Queue: "alerts"})
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	ruleModule := rule.NewRuleModule(queries)
 	actionModule := action.NewActionModule(queries)
 

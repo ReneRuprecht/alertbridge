@@ -19,6 +19,10 @@ type AlertCacheReader interface {
 }
 
 type AlertCacheWriter interface {
-	Save(context context.Context,key string, alert domain.Alert) error
+	Save(context context.Context, key string, alert domain.Alert) error
 	DeleteByKey(context context.Context, key string) error
+}
+
+type AlertEventPublisher interface {
+	Publish(context context.Context, alertID domain.Fingerprint) error
 }

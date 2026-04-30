@@ -14,11 +14,19 @@ import (
 
 const webhook_url = "/api/v1/alertmanager"
 
-type mockUseCase struct {
+type mockSaveAlertsWithCacheUseCase struct {
 	err error
 }
 
-func (m *mockUseCase) Execute(ctx context.Context, alerts []domain.Alert) error {
+func (m *mockSaveAlertsWithCacheUseCase) Execute(ctx context.Context, alerts []domain.Alert) error {
+	return m.err
+}
+
+type mockPublishAlertsUseCase struct {
+	err error
+}
+
+func (m *mockPublishAlertsUseCase) Execute(ctx context.Context, alerts []domain.Alert) error {
 	return m.err
 }
 
@@ -40,10 +48,13 @@ func TestHandleWebhook_OK(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, webhook_url, strings.NewReader(body))
 	w := httptest.NewRecorder()
 
-	uc := &mockUseCase{
+	saveAlertsWithCacheUseCase := &mockSaveAlertsWithCacheUseCase{
 		err: nil,
 	}
-	handler := alertmanager.HandleWebhook(uc)
+	publishAlertsUseCase := &mockPublishAlertsUseCase{
+		err: nil,
+	}
+	handler := alertmanager.HandleWebhook(saveAlertsWithCacheUseCase, publishAlertsUseCase)
 	handler.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
@@ -55,10 +66,13 @@ func TestHandleWebhook_InvalidJSON(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, webhook_url, strings.NewReader("{invalid"))
 	w := httptest.NewRecorder()
 
-	uc := &mockUseCase{
+	saveAlertsWithCacheUseCase := &mockSaveAlertsWithCacheUseCase{
 		err: nil,
 	}
-	handler := alertmanager.HandleWebhook(uc)
+	publishAlertsUseCase := &mockPublishAlertsUseCase{
+		err: nil,
+	}
+	handler := alertmanager.HandleWebhook(saveAlertsWithCacheUseCase, publishAlertsUseCase)
 	handler.ServeHTTP(w, req)
 
 	if w.Code != http.StatusBadRequest {
@@ -84,10 +98,13 @@ func TestHandleWebhook_InvalidRequest(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, webhook_url, strings.NewReader(body))
 	w := httptest.NewRecorder()
 
-	uc := &mockUseCase{
+	saveAlertsWithCacheUseCase := &mockSaveAlertsWithCacheUseCase{
 		err: nil,
 	}
-	handler := alertmanager.HandleWebhook(uc)
+	publishAlertsUseCase := &mockPublishAlertsUseCase{
+		err: nil,
+	}
+	handler := alertmanager.HandleWebhook(saveAlertsWithCacheUseCase, publishAlertsUseCase)
 	handler.ServeHTTP(w, req)
 
 	if w.Code != http.StatusBadRequest {
@@ -113,10 +130,13 @@ func TestHandleWebhook_InternalServerError(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, webhook_url, strings.NewReader(body))
 	w := httptest.NewRecorder()
 
-	uc := &mockUseCase{
+	saveAlertsWithCacheUseCase := &mockSaveAlertsWithCacheUseCase{
 		err: errors.New("failed"),
 	}
-	handler := alertmanager.HandleWebhook(uc)
+	publishAlertsUseCase := &mockPublishAlertsUseCase{
+		err: nil,
+	}
+	handler := alertmanager.HandleWebhook(saveAlertsWithCacheUseCase, publishAlertsUseCase)
 	handler.ServeHTTP(w, req)
 
 	if w.Code != http.StatusInternalServerError {

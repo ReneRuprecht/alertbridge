@@ -8,7 +8,7 @@ import (
 	"github.com/reneruprecht/alertbridge/backend/internal/alert/application"
 )
 
-func HandleWebhook(uc application.SaveAlertsWithCacheUseCase) http.HandlerFunc {
+func HandleWebhook(uc application.SaveAlertsWithCacheUseCase, publisher application.PublishAlertUsecase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req WebhookRequest
 
@@ -33,6 +33,12 @@ func HandleWebhook(uc application.SaveAlertsWithCacheUseCase) http.HandlerFunc {
 
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
+		}
+
+		if err := publisher.Execute(ctx, alerts); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+
 		}
 
 		w.WriteHeader(http.StatusOK)
