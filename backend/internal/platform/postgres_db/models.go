@@ -10,6 +10,14 @@ import (
 	"github.com/google/uuid"
 )
 
+type Action struct {
+	ID          uuid.UUID
+	Name        string
+	Description string
+	Type        string
+	Config      map[string]string
+}
+
 type Alert struct {
 	ID          uuid.UUID
 	Fingerprint string

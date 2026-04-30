@@ -28,3 +28,9 @@ sql:
             go_type:
               import: "github.com/google/uuid"
               type: "UUID"
+          - column: "actions.config"
+            go_type:
+              type: "map[string]string"
+          - column: "actions.description"
+            go_type:
+              type: "string"

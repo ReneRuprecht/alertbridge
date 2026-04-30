@@ -21,3 +21,11 @@ CREATE TABLE rules (
     priority INTEGER NOT NULL,
     enabled BOOLEAN NOT NULL
 );
+
+CREATE TABLE actions (
+    id UUID PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL,
+    description TEXT NOT NULL,
+    type TEXT NOT NULL,
+    config JSONB NOT NULL
+);

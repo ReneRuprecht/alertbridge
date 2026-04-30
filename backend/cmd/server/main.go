@@ -9,6 +9,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	r "github.com/redis/go-redis/v9"
+	"github.com/reneruprecht/alertbridge/backend/internal/action"
 	"github.com/reneruprecht/alertbridge/backend/internal/alert"
 	"github.com/reneruprecht/alertbridge/backend/internal/platform/postgres_db"
 	"github.com/reneruprecht/alertbridge/backend/internal/rule"
@@ -90,11 +91,13 @@ func main() {
 
 	alertModule := alert.NewAlertModule(queries, redisClient)
 	ruleModule := rule.NewRuleModule(queries)
+	actionModule := action.NewActionModule(queries)
 
 	mux := http.NewServeMux()
 
 	alertModule.RegisterAlertRoutes(mux)
 	ruleModule.RegisterRuleRoutes(mux)
+	actionModule.RegisterAlertRoutes(mux)
 
 	startServer(mux, cfg)
 

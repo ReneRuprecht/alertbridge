@@ -14,3 +14,15 @@ VALUES ($1, $2, $3, $4, $5);
 
 -- name: ListRules :many
 SELECT id, name, description, priority, enabled from rules;
+
+-- name: InsertAction :exec
+INSERT INTO actions (id, name, description, type, config)
+VALUES ($1, $2, $3, $4, $5);
+
+-- name: ListActions :many
+SELECT id, name, description, type, config from actions;
+
+-- name: FindActionById :one
+SELECT id, name, description, type, config FROM actions 
+WHERE id=$1
+LIMIT 1;

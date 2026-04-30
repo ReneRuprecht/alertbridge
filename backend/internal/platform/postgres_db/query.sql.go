@@ -12,6 +12,49 @@ import (
 	"github.com/google/uuid"
 )
 
+const findActionById = `-- name: FindActionById :one
+SELECT id, name, description, type, config FROM actions 
+WHERE id=$1
+LIMIT 1
+`
+
+func (q *Queries) FindActionById(ctx context.Context, id uuid.UUID) (Action, error) {
+	row := q.db.QueryRow(ctx, findActionById, id)
+	var i Action
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Description,
+		&i.Type,
+		&i.Config,
+	)
+	return i, err
+}
+
+const insertAction = `-- name: InsertAction :exec
+INSERT INTO actions (id, name, description, type, config)
+VALUES ($1, $2, $3, $4, $5)
+`
+
+type InsertActionParams struct {
+	ID          uuid.UUID
+	Name        string
+	Description string
+	Type        string
+	Config      map[string]string
+}
+
+func (q *Queries) InsertAction(ctx context.Context, arg InsertActionParams) error {
+	_, err := q.db.Exec(ctx, insertAction,
+		arg.ID,
+		arg.Name,
+		arg.Description,
+		arg.Type,
+		arg.Config,
+	)
+	return err
+}
+
 const insertAlert = `-- name: InsertAlert :exec
 INSERT INTO alerts (fingerprint, instance, status, starts_at, received_at, labels, annotations)
 VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -63,6 +106,36 @@ func (q *Queries) InsertRule(ctx context.Context, arg InsertRuleParams) error {
 		arg.Enabled,
 	)
 	return err
+}
+
+const listActions = `-- name: ListActions :many
+SELECT id, name, description, type, config from actions
+`
+
+func (q *Queries) ListActions(ctx context.Context) ([]Action, error) {
+	rows, err := q.db.Query(ctx, listActions)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Action
+	for rows.Next() {
+		var i Action
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Description,
+			&i.Type,
+			&i.Config,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const listAlertsByInstance = `-- name: ListAlertsByInstance :many
