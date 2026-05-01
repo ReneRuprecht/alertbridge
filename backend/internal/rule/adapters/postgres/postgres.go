@@ -2,8 +2,11 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 
+	"github.com/google/uuid"
 	"github.com/reneruprecht/alertbridge/backend/internal/platform/postgres_db"
+	"github.com/reneruprecht/alertbridge/backend/internal/rule/application"
 	"github.com/reneruprecht/alertbridge/backend/internal/rule/domain"
 )
 
@@ -26,6 +29,26 @@ func (r *RuleRepository) Save(ctx context.Context, rule domain.Rule) error {
 		Priority:    ruleEntity.Priority,
 		Enabled:     ruleEntity.Enabled,
 	})
+}
+
+func (r *RuleRepository) FindByID(ctx context.Context, ruleID domain.RuleId) (domain.Rule, error) {
+
+	row, err := r.queries.FindRuleByID(ctx, uuid.UUID(ruleID))
+
+	if err == sql.ErrNoRows {
+		return domain.Rule{}, application.ErrorRuleNotFound
+	}
+	if err != nil {
+		return domain.Rule{}, err
+	}
+	return domain.Rule{
+		ID:          domain.RuleId(row.ID),
+		Name:        domain.RuleName(row.Name),
+		Description: row.Description,
+		Priority:    domain.RulePriority(row.Priority),
+		Enabled:     row.Enabled,
+	}, nil
+
 }
 
 func (r *RuleRepository) List(ctx context.Context) ([]domain.Rule, error) {

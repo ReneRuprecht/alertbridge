@@ -15,6 +15,10 @@ VALUES ($1, $2, $3, $4, $5);
 -- name: ListRules :many
 SELECT id, name, description, priority, enabled from rules;
 
+-- name: FindRuleByID :one
+SELECT id, name, description, priority, enabled FROM rules
+WHERE id=$1;
+
 -- name: InsertAction :exec
 INSERT INTO actions (id, name, description, type, config)
 VALUES ($1, $2, $3, $4, $5);
@@ -26,3 +30,14 @@ SELECT id, name, description, type, config from actions;
 SELECT id, name, description, type, config FROM actions 
 WHERE id=$1
 LIMIT 1;
+
+-- name: InsertRuleCondition :exec
+INSERT INTO rule_conditions (id, rule_id, name, operator, field, value)
+VALUES ($1, $2, $3, $4, $5, $6);
+
+-- name: ListRuleConditionsByRuleID :many
+SELECT id, rule_id, name, operator, field, value FROM rule_conditions 
+WHERE rule_id=$1;
+
+-- name: ListRuleConditions :many
+SELECT id, rule_id, name, operator, field, value FROM rule_conditions;

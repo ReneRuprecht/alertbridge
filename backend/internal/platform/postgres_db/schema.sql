@@ -29,3 +29,12 @@ CREATE TABLE actions (
     type TEXT NOT NULL,
     config JSONB NOT NULL
 );
+
+CREATE TABLE rule_conditions (
+    id UUID PRIMARY KEY NOT NULL,
+    rule_id UUID REFERENCES rules(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    operator TEXT NOT NULL,
+    field TEXT NOT NULL,
+    value TEXT NOT NULL
+);

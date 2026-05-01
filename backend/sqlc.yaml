@@ -34,3 +34,6 @@ sql:
           - column: "actions.description"
             go_type:
               type: "string"
+          - column: "rule_conditions.rule_id"
+            go_type:
+              type: "uuid.UUID"

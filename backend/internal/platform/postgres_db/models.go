@@ -36,3 +36,12 @@ type Rule struct {
 	Priority    int32
 	Enabled     bool
 }
+
+type RuleCondition struct {
+	ID       uuid.UUID
+	RuleID   uuid.UUID
+	Name     string
+	Operator string
+	Field    string
+	Value    string
+}

@@ -31,6 +31,24 @@ func (q *Queries) FindActionById(ctx context.Context, id uuid.UUID) (Action, err
 	return i, err
 }
 
+const findRuleByID = `-- name: FindRuleByID :one
+SELECT id, name, description, priority, enabled FROM rules
+WHERE id=$1
+`
+
+func (q *Queries) FindRuleByID(ctx context.Context, id uuid.UUID) (Rule, error) {
+	row := q.db.QueryRow(ctx, findRuleByID, id)
+	var i Rule
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Description,
+		&i.Priority,
+		&i.Enabled,
+	)
+	return i, err
+}
+
 const insertAction = `-- name: InsertAction :exec
 INSERT INTO actions (id, name, description, type, config)
 VALUES ($1, $2, $3, $4, $5)
@@ -108,6 +126,32 @@ func (q *Queries) InsertRule(ctx context.Context, arg InsertRuleParams) error {
 	return err
 }
 
+const insertRuleCondition = `-- name: InsertRuleCondition :exec
+INSERT INTO rule_conditions (id, rule_id, name, operator, field, value)
+VALUES ($1, $2, $3, $4, $5, $6)
+`
+
+type InsertRuleConditionParams struct {
+	ID       uuid.UUID
+	RuleID   uuid.UUID
+	Name     string
+	Operator string
+	Field    string
+	Value    string
+}
+
+func (q *Queries) InsertRuleCondition(ctx context.Context, arg InsertRuleConditionParams) error {
+	_, err := q.db.Exec(ctx, insertRuleCondition,
+		arg.ID,
+		arg.RuleID,
+		arg.Name,
+		arg.Operator,
+		arg.Field,
+		arg.Value,
+	)
+	return err
+}
+
 const listActions = `-- name: ListActions :many
 SELECT id, name, description, type, config from actions
 `
@@ -171,6 +215,69 @@ func (q *Queries) ListAlertsByInstance(ctx context.Context, instance string) ([]
 			&i.ReceivedAt,
 			&i.Labels,
 			&i.Annotations,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listRuleConditions = `-- name: ListRuleConditions :many
+SELECT id, rule_id, name, operator, field, value FROM rule_conditions
+`
+
+func (q *Queries) ListRuleConditions(ctx context.Context) ([]RuleCondition, error) {
+	rows, err := q.db.Query(ctx, listRuleConditions)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []RuleCondition
+	for rows.Next() {
+		var i RuleCondition
+		if err := rows.Scan(
+			&i.ID,
+			&i.RuleID,
+			&i.Name,
+			&i.Operator,
+			&i.Field,
+			&i.Value,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listRuleConditionsByRuleID = `-- name: ListRuleConditionsByRuleID :many
+SELECT id, rule_id, name, operator, field, value FROM rule_conditions 
+WHERE rule_id=$1
+`
+
+func (q *Queries) ListRuleConditionsByRuleID(ctx context.Context, ruleID uuid.UUID) ([]RuleCondition, error) {
+	rows, err := q.db.Query(ctx, listRuleConditionsByRuleID, ruleID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []RuleCondition
+	for rows.Next() {
+		var i RuleCondition
+		if err := rows.Scan(
+			&i.ID,
+			&i.RuleID,
+			&i.Name,
+			&i.Operator,
+			&i.Field,
+			&i.Value,
 		); err != nil {
 			return nil, err
 		}
