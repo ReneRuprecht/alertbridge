@@ -14,3 +14,7 @@ func NewConditionID() (ConditionID, error) {
 
 	return ConditionID(id), nil
 }
+
+func (c ConditionID) String() string {
+	return uuid.UUID(c).String()
+}

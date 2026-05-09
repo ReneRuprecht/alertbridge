@@ -18,6 +18,10 @@ type AlertCacheReader interface {
 	List(context context.Context) ([]AlertCacheDto, error)
 }
 
+type AlertCacheFinder interface {
+	FindByKey(context context.Context, key string) (AlertCacheDto, error)
+}
+
 type AlertCacheWriter interface {
 	Save(context context.Context, key string, alert domain.Alert) error
 	DeleteByKey(context context.Context, key string) error

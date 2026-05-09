@@ -31,3 +31,10 @@ func (f ConditionOperator) IsValid() bool {
 		return false
 	}
 }
+func (o ConditionOperator) Apply(a, b string) bool {
+	switch o {
+	case ConditionOperatorEquals:
+		return a == b
+	}
+	return false
+}

@@ -27,3 +27,14 @@ func (uc *publishAlertUsecase) Execute(ctx context.Context, alerts []domain.Aler
 	}
 	return nil
 }
+
+type fakePublishAlertUsecase struct {
+}
+
+func NewFakeAlertEventPublisherUseCase() *fakePublishAlertUsecase {
+	return &fakePublishAlertUsecase{}
+}
+
+func (uc *fakePublishAlertUsecase) Execute(ctx context.Context, alerts []domain.Alert) error {
+	return nil
+}

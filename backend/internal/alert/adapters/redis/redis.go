@@ -89,3 +89,19 @@ func (r *AlertCache) DeleteByKey(ctx context.Context, key string) error {
 	return nil
 
 }
+
+func (r *AlertCache) FindByKey(ctx context.Context, key string) (application.AlertCacheDto, error) {
+
+	cmd := r.client.Get(ctx, key)
+
+	val, _ := cmd.Result()
+	var a alertCacheEntity
+	err := json.Unmarshal([]byte(val), &a)
+	if err != nil {
+		return application.AlertCacheDto{}, err
+	}
+
+	alert := toCacheDto(a)
+	return alert, nil
+
+}

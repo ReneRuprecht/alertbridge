@@ -7,7 +7,15 @@ type ConditionField string
 var ErrorConditionFieldEmpty = errors.New("Field cannot be empty")
 var ErrorConditionFieldInvalid = errors.New("Field is invalid")
 
-const ConditionFieldStatus ConditionField = "status"
+const (
+	ConditionFieldStatus   ConditionField = "status"
+	ConditionFieldSeverity ConditionField = "severity"
+)
+
+var validConditionFields = map[ConditionField]struct{}{
+	ConditionFieldStatus:   {},
+	ConditionFieldSeverity: {},
+}
 
 func NewConditionField(field string) (ConditionField, error) {
 
@@ -24,10 +32,6 @@ func NewConditionField(field string) (ConditionField, error) {
 }
 
 func (f ConditionField) IsValid() bool {
-	switch f {
-	case ConditionFieldStatus:
-		return true
-	default:
-		return false
-	}
+	_, ok := validConditionFields[f]
+	return ok
 }

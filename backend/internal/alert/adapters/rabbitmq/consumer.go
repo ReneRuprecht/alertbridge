@@ -42,7 +42,7 @@ func (c *Consumer) Consume(ctx context.Context) error {
 				return
 			}
 
-			if err := c.processor.Execute(ctx, alertID); err != nil {
+			if _, err := c.processor.Execute(ctx, alertID); err != nil {
 				log.Printf("process failed: %v", err)
 			}
 		}

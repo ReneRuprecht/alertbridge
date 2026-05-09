@@ -17,10 +17,11 @@ import (
 )
 
 type config struct {
-	PostgresConnStr string
-	RedisConnStr    string
-	RabbitMQConnStr string
-	Port            string
+	PostgresConnStr  string
+	RedisConnStr     string
+	RabbitMQConnStr  string
+	Port             string
+	PublisherEnabled bool
 }
 
 func loadConfig() config {
@@ -45,7 +46,12 @@ func loadConfig() config {
 		serverPort = "8080"
 	}
 
-	return config{PostgresConnStr: postgresConnStr, RabbitMQConnStr: rabbitMQConnStr, RedisConnStr: redisConnStr, Port: serverPort}
+	publisherEnabled := false
+	if os.Getenv("AB_PUBLISHER_ENABLED") == "1" {
+		publisherEnabled = true
+	}
+
+	return config{PostgresConnStr: postgresConnStr, RabbitMQConnStr: rabbitMQConnStr, RedisConnStr: redisConnStr, Port: serverPort, PublisherEnabled: publisherEnabled}
 
 }
 
@@ -108,7 +114,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	alertModule, err := alert.NewAlertModule(queries, redisClient, &alert.RabbitConfig{Channel: alertCh, Queue: "alerts"})
+	alertModule, err := alert.NewAlertModule(queries, redisClient, &alert.RabbitConfig{Channel: alertCh, Queue: "alerts", Enabled: cfg.PublisherEnabled})
 	if err != nil {
 		log.Fatal(err)
 	}

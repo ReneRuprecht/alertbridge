@@ -1,6 +1,7 @@
 package alert
 
 import (
+	"fmt"
 	"net/http"
 
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -18,6 +19,7 @@ import (
 type RabbitConfig struct {
 	Channel *amqp.Channel
 	Queue   string
+	Enabled bool
 }
 
 type AlertModule struct {
@@ -31,18 +33,31 @@ func NewAlertModule(queries *postgres_db.Queries, client *r.Client, rabbitConfig
 	repo := postgres.NewAlertRepository(queries)
 	cache := redis.NewAlertCache(client)
 
-	publisher := rabbitmq.NewAlertEventPublisher(rabbitConfig.Channel, rabbitConfig.Queue)
-	err := publisher.Init()
+	saveAlertsWithCache := application.NewSaveAlertsWithCacheUseCase(repo, cache)
+	listAlertsByInstance := application.NewListAlertsByInstanceUseCase(repo)
+	listActiveAlerts := application.NewListActiveAlertsUseCase(cache)
 
-	if err != nil {
-		return nil, err
+	var publisher application.PublishAlertUsecase
+
+	if !rabbitConfig.Enabled {
+		publisher = application.NewFakeAlertEventPublisherUseCase()
+	} else {
+
+		publisherAdapter := rabbitmq.NewAlertEventPublisher(rabbitConfig.Channel, rabbitConfig.Queue)
+		err := publisherAdapter.Init()
+
+		if err != nil {
+			return nil, err
+		}
+		publisher = application.NewAlertEventPublisherUseCase(publisherAdapter)
+        fmt.Println("publisher enabled")
 	}
 
 	return &AlertModule{
-		SaveAlertsWithCache:  application.NewSaveAlertsWithCacheUseCase(repo, cache),
-		ListAlertsByInstance: application.NewListAlertsByInstanceUseCase(repo),
-		ListActiveAlerts:     application.NewListActiveAlertsUseCase(cache),
-		PublishAlert:         application.NewAlertEventPublisherUseCase(publisher),
+		SaveAlertsWithCache:  saveAlertsWithCache,
+		ListAlertsByInstance: listAlertsByInstance,
+		ListActiveAlerts:     listActiveAlerts,
+		PublishAlert:         publisher,
 	}, nil
 }
 

@@ -17,6 +17,7 @@ export default function RulesTable({ reloadKey }: RulesTableProps) {
         const fetchRules = async () => {
             try {
                 const data: RulesResponse = await getRules()
+                console.log(data)
 
                 setRules(data.rules)
             }
