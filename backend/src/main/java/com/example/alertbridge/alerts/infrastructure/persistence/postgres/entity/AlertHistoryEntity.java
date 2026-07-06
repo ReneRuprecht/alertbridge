@@ -67,4 +67,48 @@ public class AlertHistoryEntity {
         this.receivedAt = receivedAt;
         this.eventKey = eventKey;
     }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public String getFingerprint() {
+        return fingerprint;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public String getAlertName() {
+        return alertName;
+    }
+
+    public String getSeverity() {
+        return severity;
+    }
+
+    public String getEnvironment() {
+        return environment;
+    }
+
+    public String getInstance() {
+        return instance;
+    }
+
+    public String getJob() {
+        return job;
+    }
+
+    public Instant getStartsAt() {
+        return startsAt;
+    }
+
+    public Instant getReceivedAt() {
+        return receivedAt;
+    }
+
+    public String getEventKey() {
+        return eventKey;
+    }
 }

@@ -3,6 +3,7 @@ package com.example.alertbridge.alerts.infrastructure.persistence.postgres;
 import com.example.alertbridge.alerts.domain.model.Alert;
 import com.example.alertbridge.alerts.domain.ports.AlertBatchWriterPort;
 import com.example.alertbridge.alerts.infrastructure.persistence.postgres.entity.AlertHistoryEntity;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public class PostgresAlertHistoryRepository implements AlertBatchWriterPort {
     }
 
     @Override
+    @Transactional
     public void saveAll(List<Alert> alerts) {
 
         List<AlertHistoryEntity> entities = alerts
@@ -24,7 +26,21 @@ public class PostgresAlertHistoryRepository implements AlertBatchWriterPort {
                 .map(AlertHistoryEntityMapper::toEntity)
                 .toList();
 
-        alertHistoryJpaRepository.saveAll(entities);
+        for (AlertHistoryEntity entity : entities) {
+            alertHistoryJpaRepository.saveWithoutDuplicateEventKey(
+                    entity.getId(),
+                    entity.getFingerprint(),
+                    entity.getStatus(),
+                    entity.getAlertName(),
+                    entity.getSeverity(),
+                    entity.getEnvironment(),
+                    entity.getInstance(),
+                    entity.getJob(),
+                    entity.getStartsAt(),
+                    entity.getReceivedAt(),
+                    entity.getEventKey()
+            );
+        }
 
     }
 }
