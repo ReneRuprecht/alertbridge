@@ -1,4 +1,4 @@
-package com.example.alertbridge.alerts.unit.http;
+package com.example.alertbridge.alerts.unit.infrastructure.http;
 
 import com.example.alertbridge.alerts.application.command.ReceiveAlertCommand;
 import com.example.alertbridge.alerts.application.command.ReceiveAlertsCommand;

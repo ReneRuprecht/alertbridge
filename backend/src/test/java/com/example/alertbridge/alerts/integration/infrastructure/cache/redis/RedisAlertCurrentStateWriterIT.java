@@ -6,8 +6,8 @@ import com.example.alertbridge.alerts.domain.value.AlertFingerprint;
 import com.example.alertbridge.alerts.domain.value.AlertLabels;
 import com.example.alertbridge.alerts.domain.value.AlertSeverity;
 import com.example.alertbridge.alerts.domain.value.AlertStatus;
-import com.example.alertbridge.alerts.infrastructure.cache.redis.AlertCurrentState;
-import com.example.alertbridge.alerts.infrastructure.cache.redis.RedisAlertCurrentStateAdapter;
+import com.example.alertbridge.alerts.infrastructure.cache.redis.AlertCurrentStateRedis;
+import com.example.alertbridge.alerts.infrastructure.cache.redis.RedisAlertCurrentStateWriter;
 import com.redis.testcontainers.RedisContainer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,16 +28,16 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @Testcontainers
 @ContextConfiguration(classes = RedisTestConfiguration.class)
 @ExtendWith(SpringExtension.class)
-public class RedisAlertCurrentStateAdapterIT {
+public class RedisAlertCurrentStateWriterIT {
 
     @Container
     static RedisContainer redis = new RedisContainer("redis:8.2.3-alpine");
 
     @Autowired
-    private RedisAlertCurrentStateAdapter redisAlertCurrentStateAdapter;
+    private RedisAlertCurrentStateWriter redisAlertCurrentStateWriter;
 
     @Autowired
-    private RedisTemplate<String, AlertCurrentState> redisTemplate;
+    private RedisTemplate<String, AlertCurrentStateRedis> redisTemplate;
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
@@ -55,9 +55,9 @@ public class RedisAlertCurrentStateAdapterIT {
 
         Alert alert = testAlert("fp1", "FIRING");
 
-        redisAlertCurrentStateAdapter.saveAll(List.of(alert));
+        redisAlertCurrentStateWriter.saveAll(List.of(alert));
 
-        AlertCurrentState stored = redisTemplate.opsForValue().get("alert:fp1");
+        AlertCurrentStateRedis stored = redisTemplate.opsForValue().get("alert:fp1");
 
         assertThat(stored).isNotNull();
         assertThat(stored.fingerprint()).isEqualTo("fp1");
@@ -69,10 +69,10 @@ public class RedisAlertCurrentStateAdapterIT {
     @Test
     void shouldDeleteCurrentState_whenAlertIsResolved() {
 
-        redisAlertCurrentStateAdapter.saveAll(List.of(testAlert("fp1", "FIRING")));
+        redisAlertCurrentStateWriter.saveAll(List.of(testAlert("fp1", "FIRING")));
         assertThat(redisTemplate.hasKey("alert:fp1")).isTrue();
 
-        redisAlertCurrentStateAdapter.saveAll(List.of(testAlert("fp1", "RESOLVED")));
+        redisAlertCurrentStateWriter.saveAll(List.of(testAlert("fp1", "RESOLVED")));
         assertThat(redisTemplate.hasKey("alert:fp1")).isFalse();
     }
 

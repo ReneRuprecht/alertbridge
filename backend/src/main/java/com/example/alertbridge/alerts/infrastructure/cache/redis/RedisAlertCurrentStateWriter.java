@@ -8,10 +8,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import java.time.Duration;
 import java.util.List;
 
-public class RedisAlertCurrentStateAdapter implements AlertCurrentStateWriterPort {
-    private final RedisTemplate<String, AlertCurrentState> redisTemplate;
+public class RedisAlertCurrentStateWriter implements AlertCurrentStateWriterPort {
+    private final RedisTemplate<String, AlertCurrentStateRedis> redisTemplate;
 
-    public RedisAlertCurrentStateAdapter(RedisTemplate<String, AlertCurrentState> redisTemplate) {
+    public RedisAlertCurrentStateWriter(RedisTemplate<String, AlertCurrentStateRedis> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 
