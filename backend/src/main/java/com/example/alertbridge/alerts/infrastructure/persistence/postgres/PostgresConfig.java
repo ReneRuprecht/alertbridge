@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 public class PostgresConfig {
 
     @Bean
-    AlertHistoryWriterPort alertBatchWriterPort(AlertHistoryJpaRepository alertHistoryJpaRepository) {
+    AlertHistoryWriterPort postgresAlertHistoryAdapter(AlertHistoryJpaRepository alertHistoryJpaRepository) {
         return new PostgresAlertHistoryAdapter(alertHistoryJpaRepository);
     }
 }
