@@ -4,11 +4,9 @@ import com.example.alertbridge.alerts.domain.model.Alert;
 import com.example.alertbridge.alerts.domain.ports.AlertHistoryWriterPort;
 import com.example.alertbridge.alerts.infrastructure.persistence.postgres.entity.AlertHistoryEntity;
 import jakarta.transaction.Transactional;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
 public class PostgresAlertHistoryAdapter implements AlertHistoryWriterPort {
 
     private final AlertHistoryJpaRepository alertHistoryJpaRepository;

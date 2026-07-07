@@ -31,7 +31,7 @@ public class RedisConfig {
     }
 
     @Bean
-    AlertCurrentStateWriterPort alertCurrentStateBatchWriterPort(RedisTemplate<String, AlertCurrentState> redisTemplate) {
+    AlertCurrentStateWriterPort redisAlertCurrentStateAdapter(RedisTemplate<String, AlertCurrentState> redisTemplate) {
         return new RedisAlertCurrentStateAdapter(redisTemplate);
     }
 }

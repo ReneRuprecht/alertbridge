@@ -4,12 +4,10 @@ import com.example.alertbridge.alerts.domain.model.Alert;
 import com.example.alertbridge.alerts.domain.ports.AlertCurrentStateWriterPort;
 import com.example.alertbridge.alerts.domain.value.AlertStatus;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Repository;
 
 import java.time.Duration;
 import java.util.List;
 
-@Repository
 public class RedisAlertCurrentStateAdapter implements AlertCurrentStateWriterPort {
     private final RedisTemplate<String, AlertCurrentState> redisTemplate;
 
