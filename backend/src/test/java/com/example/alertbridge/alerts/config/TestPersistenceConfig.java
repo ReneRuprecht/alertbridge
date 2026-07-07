@@ -1,7 +1,7 @@
 package com.example.alertbridge.alerts.config;
 
-import com.example.alertbridge.alerts.domain.ports.AlertBatchWriterPort;
-import com.example.alertbridge.alerts.infrastructure.persistence.inmemory.InMemoryAlertBatchWriterAdapter;
+import com.example.alertbridge.alerts.domain.ports.AlertHistoryWriterPort;
+import com.example.alertbridge.alerts.infrastructure.persistence.inmemory.InMemoryAlertHistoryWriterAdapter;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
@@ -11,7 +11,7 @@ public class TestPersistenceConfig {
 
     @Bean
     @Profile("test")
-    AlertBatchWriterPort alertBatchWriterPort() {
-        return new InMemoryAlertBatchWriterAdapter();
+    AlertHistoryWriterPort alertBatchWriterPort() {
+        return new InMemoryAlertHistoryWriterAdapter();
     }
 }

@@ -1,6 +1,6 @@
 package com.example.alertbridge.alerts.infrastructure.cache.redis;
 
-import com.example.alertbridge.alerts.domain.ports.AlertCurrentStateBatchWriterPort;
+import com.example.alertbridge.alerts.domain.ports.AlertCurrentStateWriterPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -31,7 +31,7 @@ public class RedisConfig {
     }
 
     @Bean
-    AlertCurrentStateBatchWriterPort alertCurrentStateBatchWriterPort(RedisTemplate<String, AlertCurrentState> redisTemplate) {
-        return new RedisAlertCurrentStateCache(redisTemplate);
+    AlertCurrentStateWriterPort alertCurrentStateBatchWriterPort(RedisTemplate<String, AlertCurrentState> redisTemplate) {
+        return new RedisAlertCurrentStateAdapter(redisTemplate);
     }
 }

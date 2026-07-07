@@ -7,7 +7,7 @@ import com.example.alertbridge.alerts.domain.value.AlertLabels;
 import com.example.alertbridge.alerts.domain.value.AlertSeverity;
 import com.example.alertbridge.alerts.domain.value.AlertStatus;
 import com.example.alertbridge.alerts.infrastructure.cache.redis.AlertCurrentState;
-import com.example.alertbridge.alerts.infrastructure.cache.redis.RedisAlertCurrentStateCache;
+import com.example.alertbridge.alerts.infrastructure.cache.redis.RedisAlertCurrentStateAdapter;
 import com.redis.testcontainers.RedisContainer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,13 +28,13 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @Testcontainers
 @ContextConfiguration(classes = RedisTestConfiguration.class)
 @ExtendWith(SpringExtension.class)
-public class AlertCurrentStateCacheIT {
+public class RedisAlertCurrentStateAdapterIT {
 
     @Container
     static RedisContainer redis = new RedisContainer("redis:8.2.3-alpine");
 
     @Autowired
-    private RedisAlertCurrentStateCache redisAlertCurrentStateCache;
+    private RedisAlertCurrentStateAdapter redisAlertCurrentStateAdapter;
 
     @Autowired
     private RedisTemplate<String, AlertCurrentState> redisTemplate;
@@ -55,7 +55,7 @@ public class AlertCurrentStateCacheIT {
 
         Alert alert = testAlert("fp1", "FIRING");
 
-        redisAlertCurrentStateCache.saveAll(List.of(alert));
+        redisAlertCurrentStateAdapter.saveAll(List.of(alert));
 
         AlertCurrentState stored = redisTemplate.opsForValue().get("alert:fp1");
 
@@ -69,10 +69,10 @@ public class AlertCurrentStateCacheIT {
     @Test
     void shouldDeleteCurrentState_whenAlertIsResolved() {
 
-        redisAlertCurrentStateCache.saveAll(List.of(testAlert("fp1", "FIRING")));
+        redisAlertCurrentStateAdapter.saveAll(List.of(testAlert("fp1", "FIRING")));
         assertThat(redisTemplate.hasKey("alert:fp1")).isTrue();
 
-        redisAlertCurrentStateCache.saveAll(List.of(testAlert("fp1", "RESOLVED")));
+        redisAlertCurrentStateAdapter.saveAll(List.of(testAlert("fp1", "RESOLVED")));
         assertThat(redisTemplate.hasKey("alert:fp1")).isFalse();
     }
 

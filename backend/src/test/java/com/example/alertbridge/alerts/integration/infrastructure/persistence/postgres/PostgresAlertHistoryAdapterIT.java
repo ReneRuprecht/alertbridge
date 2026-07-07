@@ -5,7 +5,7 @@ import com.example.alertbridge.alerts.domain.value.AlertFingerprint;
 import com.example.alertbridge.alerts.domain.value.AlertLabels;
 import com.example.alertbridge.alerts.domain.value.AlertSeverity;
 import com.example.alertbridge.alerts.domain.value.AlertStatus;
-import com.example.alertbridge.alerts.infrastructure.persistence.postgres.PostgresAlertHistoryRepository;
+import com.example.alertbridge.alerts.infrastructure.persistence.postgres.PostgresAlertHistoryAdapter;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,6 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
@@ -25,13 +24,13 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DataJpaTest
 @Testcontainers
-@Import(PostgresAlertHistoryRepository.class)
-public class PostgresAlertHistoryRepositoryIT {
+@Import(PostgresAlertHistoryAdapter.class)
+public class PostgresAlertHistoryAdapterIT {
 
     static PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:18-alpine");
 
     @Autowired
-    private PostgresAlertHistoryRepository postgresAlertHistoryRepository;
+    private PostgresAlertHistoryAdapter postgresAlertHistoryAdapter;
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
@@ -65,7 +64,7 @@ public class PostgresAlertHistoryRepositoryIT {
                 Instant.parse("2026-01-01T00:00:00Z")
         );
 
-        postgresAlertHistoryRepository.saveAll(List.of(alert));
+        postgresAlertHistoryAdapter.saveAll(List.of(alert));
     }
 
 

@@ -4,8 +4,8 @@ import com.example.alertbridge.alerts.application.ReceiveAlertsUseCase;
 import com.example.alertbridge.alerts.application.command.ReceiveAlertCommand;
 import com.example.alertbridge.alerts.application.command.ReceiveAlertsCommand;
 import com.example.alertbridge.alerts.domain.model.Alert;
-import com.example.alertbridge.alerts.domain.ports.AlertBatchWriterPort;
-import com.example.alertbridge.alerts.domain.ports.AlertCurrentStateBatchWriterPort;
+import com.example.alertbridge.alerts.domain.ports.AlertHistoryWriterPort;
+import com.example.alertbridge.alerts.domain.ports.AlertCurrentStateWriterPort;
 import com.example.alertbridge.alerts.domain.value.AlertStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,10 +26,10 @@ import static org.mockito.Mockito.verifyNoInteractions;
 public class ReceiveAlertsUseCaseTest {
 
     @Mock
-    AlertBatchWriterPort alertBatchWriterPort;
+    AlertHistoryWriterPort alertHistoryWriterPort;
 
     @Mock
-    AlertCurrentStateBatchWriterPort alertCurrentStateBatchWriterPort;
+    AlertCurrentStateWriterPort alertCurrentStateWriterPort;
 
     @InjectMocks
     ReceiveAlertsUseCase underTest;
@@ -70,9 +70,9 @@ public class ReceiveAlertsUseCaseTest {
         underTest.receive(command);
 
 
-        verify(alertBatchWriterPort).saveAll(historyCaptor.capture());
+        verify(alertHistoryWriterPort).saveAll(historyCaptor.capture());
 
-        verify(alertCurrentStateBatchWriterPort).saveAll(currentStateCaptor.capture());
+        verify(alertCurrentStateWriterPort).saveAll(currentStateCaptor.capture());
 
 
         List<Alert> historyAlerts = historyCaptor.getValue();
@@ -100,7 +100,7 @@ public class ReceiveAlertsUseCaseTest {
         underTest.receive(new ReceiveAlertsCommand(List.of()));
 
 
-        verifyNoInteractions(alertBatchWriterPort, alertCurrentStateBatchWriterPort);
+        verifyNoInteractions(alertHistoryWriterPort, alertCurrentStateWriterPort);
     }
 
 
@@ -109,6 +109,6 @@ public class ReceiveAlertsUseCaseTest {
 
         underTest.receive(new ReceiveAlertsCommand(null));
 
-        verifyNoInteractions(alertBatchWriterPort, alertCurrentStateBatchWriterPort);
+        verifyNoInteractions(alertHistoryWriterPort, alertCurrentStateWriterPort);
     }
 }
