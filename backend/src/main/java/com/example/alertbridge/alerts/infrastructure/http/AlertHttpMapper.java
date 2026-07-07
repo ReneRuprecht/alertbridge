@@ -45,7 +45,7 @@ public class AlertHttpMapper {
                 alert.instance(),
                 alert.job(),
                 alert.startsAt(),
-                alert.updatedAt()
+                alert.lastUpdatedAt()
         );
     }
 }

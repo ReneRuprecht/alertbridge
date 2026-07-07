@@ -18,7 +18,7 @@ public class AlertsApplicationConfig {
     }
 
     @Bean
-    public GetCurrentAlertsUseCase currentAlertsUseCase(AlertCurrentStateReaderPort alertCurrentStateReaderPort) {
+    public GetCurrentAlertsUseCase getCurrentAlertsUseCase(AlertCurrentStateReaderPort alertCurrentStateReaderPort) {
         return new GetCurrentAlertsUseCase(alertCurrentStateReaderPort);
     }
 }

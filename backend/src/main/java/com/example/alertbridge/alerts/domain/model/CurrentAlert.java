@@ -14,5 +14,5 @@ public record CurrentAlert(AlertFingerprint fingerprint,
                            String instance,
                            String job,
                            Instant startsAt,
-                           Instant updatedAt) {
+                           Instant lastUpdatedAt) {
 }

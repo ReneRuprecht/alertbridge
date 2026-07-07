@@ -64,6 +64,6 @@ public class AlertCurrentStateMapperTest {
 
         assertThat(result.severity()).isEqualTo(AlertSeverity.CRITICAL);
 
-        assertThat(result.updatedAt()).isEqualTo(Instant.parse("2026-01-01T00:01:00Z"));
+        assertThat(result.lastUpdatedAt()).isEqualTo(Instant.parse("2026-01-01T00:01:00Z"));
     }
 }
