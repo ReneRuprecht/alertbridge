@@ -1,5 +1,6 @@
 package com.example.alertbridge.alerts.infrastructure.cache.redis;
 
+import com.example.alertbridge.alerts.domain.ports.AlertCurrentStateReaderPort;
 import com.example.alertbridge.alerts.domain.ports.AlertCurrentStateWriterPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,16 +13,17 @@ import tools.jackson.databind.ObjectMapper;
 @Configuration
 public class RedisConfig {
     @Bean
-    RedisTemplate<String, AlertCurrentState> alertRedisTemplate(RedisConnectionFactory connectionFactory,
-                                                                ObjectMapper objectMapper) {
+    RedisTemplate<String, AlertCurrentStateRedis> alertRedisTemplate(RedisConnectionFactory connectionFactory,
+                                                                     ObjectMapper objectMapper) {
 
-        RedisTemplate<String, AlertCurrentState> template = new RedisTemplate<>();
+        RedisTemplate<String, AlertCurrentStateRedis> template = new RedisTemplate<>();
 
         template.setConnectionFactory(connectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
 
-        JacksonJsonRedisSerializer<AlertCurrentState> serializer = new JacksonJsonRedisSerializer<>(objectMapper,
-                AlertCurrentState.class
+        JacksonJsonRedisSerializer<AlertCurrentStateRedis> serializer = new JacksonJsonRedisSerializer<>(
+                objectMapper,
+                AlertCurrentStateRedis.class
         );
 
         template.setValueSerializer(serializer);
@@ -31,7 +33,12 @@ public class RedisConfig {
     }
 
     @Bean
-    AlertCurrentStateWriterPort redisAlertCurrentStateAdapter(RedisTemplate<String, AlertCurrentState> redisTemplate) {
-        return new RedisAlertCurrentStateAdapter(redisTemplate);
+    AlertCurrentStateWriterPort redisAlertCurrentStateWriter(RedisTemplate<String, AlertCurrentStateRedis> redisTemplate) {
+        return new RedisAlertCurrentStateWriter(redisTemplate);
+    }
+
+    @Bean
+    AlertCurrentStateReaderPort redisAlertCurrentStateReader(RedisTemplate<String, AlertCurrentStateRedis> redisTemplate) {
+        return new RedisAlertCurrentStateReader(redisTemplate);
     }
 }
