@@ -2,6 +2,7 @@ package com.example.alertbridge.alerts.config;
 
 import com.example.alertbridge.alerts.application.ReceiveAlertsUseCase;
 import com.example.alertbridge.alerts.domain.ports.AlertBatchWriterPort;
+import com.example.alertbridge.alerts.domain.ports.AlertCurrentStateBatchWriterPort;
 import com.example.alertbridge.alerts.infrastructure.persistence.postgres.AlertHistoryJpaRepository;
 import com.example.alertbridge.alerts.infrastructure.persistence.postgres.PostgresAlertHistoryRepository;
 import org.springframework.context.annotation.Bean;
@@ -16,7 +17,8 @@ public class AlertsApplicationConfig {
     }
 
     @Bean
-    public ReceiveAlertsUseCase receiveAlertsUseCase(AlertBatchWriterPort alertBatchWriterPort) {
-        return new ReceiveAlertsUseCase(alertBatchWriterPort);
+    public ReceiveAlertsUseCase receiveAlertsUseCase(AlertBatchWriterPort alertBatchWriterPort,
+                                                     AlertCurrentStateBatchWriterPort alertCurrentStateBatchWriterPort) {
+        return new ReceiveAlertsUseCase(alertBatchWriterPort, alertCurrentStateBatchWriterPort);
     }
 }

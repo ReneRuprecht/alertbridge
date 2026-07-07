@@ -5,6 +5,7 @@ import com.example.alertbridge.alerts.application.command.ReceiveAlertCommand;
 import com.example.alertbridge.alerts.application.command.ReceiveAlertsCommand;
 import com.example.alertbridge.alerts.domain.model.Alert;
 import com.example.alertbridge.alerts.domain.ports.AlertBatchWriterPort;
+import com.example.alertbridge.alerts.domain.ports.AlertCurrentStateBatchWriterPort;
 import com.example.alertbridge.alerts.domain.value.AlertStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,7 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.Instant;
 import java.util.List;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
@@ -27,14 +28,21 @@ public class ReceiveAlertsUseCaseTest {
     @Mock
     AlertBatchWriterPort alertBatchWriterPort;
 
+    @Mock
+    AlertCurrentStateBatchWriterPort alertCurrentStateBatchWriterPort;
+
     @InjectMocks
     ReceiveAlertsUseCase underTest;
 
     @Captor
-    private ArgumentCaptor<List<Alert>> captor;
+    ArgumentCaptor<List<Alert>> historyCaptor;
+
+    @Captor
+    ArgumentCaptor<List<Alert>> currentStateCaptor;
+
 
     @Test
-    void shouldMapAndCallPort_whenAlertsArePresent() {
+    void shouldMapAndCallPorts_whenAlertsArePresent() {
 
         ReceiveAlertsCommand command = new ReceiveAlertsCommand(List.of(
                 new ReceiveAlertCommand(
@@ -58,35 +66,49 @@ public class ReceiveAlertsUseCaseTest {
                 )
         ));
 
+
         underTest.receive(command);
 
-        verify(alertBatchWriterPort).saveAll(captor.capture());
 
-        List<Alert> saved = captor.getValue();
+        verify(alertBatchWriterPort).saveAll(historyCaptor.capture());
 
-        assertThat(saved.size()).isEqualTo(2);
+        verify(alertCurrentStateBatchWriterPort).saveAll(currentStateCaptor.capture());
 
-        Alert alert = saved.getFirst();
+
+        List<Alert> historyAlerts = historyCaptor.getValue();
+        List<Alert> currentStateAlerts = currentStateCaptor.getValue();
+
+
+        assertThat(historyAlerts).hasSize(2);
+
+        assertThat(currentStateAlerts).hasSize(2);
+
+
+        Alert alert = historyAlerts.getFirst();
 
         assertThat(alert.fingerprint().value()).isEqualTo("fp1");
+
         assertThat(alert.status()).isEqualTo(AlertStatus.FIRING);
+
         assertThat(alert.labels().alertName()).isEqualTo("CPUHigh");
     }
 
+
     @Test
-    void shouldNotCallPort_whenAlertsAreEmpty() {
+    void shouldNotCallPorts_whenAlertsAreEmpty() {
 
         underTest.receive(new ReceiveAlertsCommand(List.of()));
 
-        verifyNoInteractions(alertBatchWriterPort);
+
+        verifyNoInteractions(alertBatchWriterPort, alertCurrentStateBatchWriterPort);
     }
 
+
     @Test
-    void shouldNotCallPort_whenAlertsAreNull() {
+    void shouldNotCallPorts_whenAlertsAreNull() {
 
         underTest.receive(new ReceiveAlertsCommand(null));
 
-        verifyNoInteractions(alertBatchWriterPort);
+        verifyNoInteractions(alertBatchWriterPort, alertCurrentStateBatchWriterPort);
     }
-
 }
