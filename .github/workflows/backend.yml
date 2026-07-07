@@ -1,0 +1,48 @@
+name: Backend
+
+on:
+  workflow_call:
+
+jobs:
+  unit-test:
+    runs-on: self-hosted
+    container:
+      image: reneruprecht/ci-java21jdk
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v7
+
+      - name: Cache Maven Packages
+        uses: actions/cache@v6
+        with:
+          path: /root/.m2/repository 
+          key: container-maven-${{ hashFiles('backend/pom.xml') }}
+          restore-keys: |
+            container-maven-
+
+      - name: Test
+        working-directory: ./backend
+        run: |
+          ./mvnw -B -ntp -DtrimStackTrace=false test
+
+  integration-test:
+    needs: unit-test
+    runs-on: self-hosted
+    container:
+      image: reneruprecht/ci-java21jdk
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v7
+
+      - name: Cache Maven Packages
+        uses: actions/cache@v6
+        with:
+          path: /root/.m2/repository 
+          key: container-maven-${{ hashFiles('backend/pom.xml') }}
+          restore-keys: |
+            container-maven-
+
+      - name: Verify
+        working-directory: ./backend
+        run: |
+          ./mvnw -B -ntp -DtrimStackTrace=false -DskipUTs=true verify 

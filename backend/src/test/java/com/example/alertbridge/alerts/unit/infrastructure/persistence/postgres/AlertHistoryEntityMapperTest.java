@@ -1,0 +1,38 @@
+package com.example.alertbridge.alerts.unit.infrastructure.persistence.postgres;
+
+import com.example.alertbridge.alerts.domain.model.Alert;
+import com.example.alertbridge.alerts.domain.value.AlertFingerprint;
+import com.example.alertbridge.alerts.domain.value.AlertLabels;
+import com.example.alertbridge.alerts.domain.value.AlertSeverity;
+import com.example.alertbridge.alerts.domain.value.AlertStatus;
+import com.example.alertbridge.alerts.infrastructure.persistence.postgres.AlertHistoryEntityMapper;
+import com.example.alertbridge.alerts.infrastructure.persistence.postgres.entity.AlertHistoryEntity;
+import org.junit.jupiter.api.Test;
+
+import java.time.Instant;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
+public class AlertHistoryEntityMapperTest {
+
+    @Test
+    void shouldMapAlertToHistoryEntity() {
+
+        Alert alert = Alert.create(
+                new AlertFingerprint("fp1"),
+                AlertStatus.FIRING,
+                new AlertLabels("CPUHigh", AlertSeverity.CRITICAL, "prod", "instance-1", "job-a"),
+                Instant.parse("2026-01-01T00:00:00Z")
+        );
+
+        AlertHistoryEntity entity = AlertHistoryEntityMapper.toEntity(alert);
+
+        assertThat(entity.getFingerprint()).isEqualTo("fp1");
+
+        assertThat(entity.getStatus()).isEqualTo("FIRING");
+
+        assertThat(entity.getAlertName()).isEqualTo("CPUHigh");
+
+        assertThat(entity.getEventKey()).isNotBlank();
+    }
+}

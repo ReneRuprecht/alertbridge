@@ -1,0 +1,25 @@
+name: Main
+
+on:
+  push:
+
+jobs:
+  changes:
+    runs-on: self-hosted
+    container:
+      image: reneruprecht/ci-node24
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+    steps:
+    - uses: actions/checkout@v7
+
+    - uses: dorny/paths-filter@v4
+      id: filter
+      with:
+        filters: |
+          backend:
+            - 'backend/**'
+  backend:
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
+    uses: ./.github/workflows/backend.yml
