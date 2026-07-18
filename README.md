@@ -44,10 +44,11 @@ Die gespeicherten Daten sollen anschließend strukturiert abgefragt und visualis
 - Empfang von Prometheus Alertmanager Webhooks
 - Speicherung der Alert-Historie in PostgreSQL
 - Speicherung der aktuellen Alerts in Redis
+- Read API für aktuelle Alerts
+- Read API für Alert-Historie
 - Unit- und Integrationstests
 - Testcontainer für PostgreSQL und Redis
 - CI-Pipeline für automatisierte Tests
 
 ### In Arbeit
-- Read API für aktuelle Alerts
-- Read API für Alert-Historie
+- Frontend zur Visualisierung und Verwaltung der Alerts
