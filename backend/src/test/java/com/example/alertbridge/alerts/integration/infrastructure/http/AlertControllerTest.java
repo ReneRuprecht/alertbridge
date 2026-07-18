@@ -1,6 +1,9 @@
 package com.example.alertbridge.alerts.integration.infrastructure.http;
 
+import com.example.alertbridge.alerts.application.GetAlertHistoryByInstanceUseCase;
 import com.example.alertbridge.alerts.application.GetCurrentAlertsUseCase;
+import com.example.alertbridge.alerts.application.query.GetAlertHistoryByInstanceQuery;
+import com.example.alertbridge.alerts.domain.model.AlertHistorySnapshot;
 import com.example.alertbridge.alerts.domain.model.CurrentAlert;
 import com.example.alertbridge.alerts.domain.value.AlertFingerprint;
 import com.example.alertbridge.alerts.domain.value.AlertSeverity;
@@ -26,6 +29,9 @@ class AlertControllerTest {
 
     @MockitoBean
     GetCurrentAlertsUseCase getCurrentAlertsUseCase;
+
+    @MockitoBean
+    GetAlertHistoryByInstanceUseCase getAlertHistoryByInstanceUseCase;
 
     @Autowired
     MockMvc mockMvc;
@@ -80,4 +86,55 @@ class AlertControllerTest {
                 .andExpect(jsonPath("$.alerts").isArray())
                 .andExpect(jsonPath("$.alerts").isEmpty());
     }
+
+    @Test
+    void shouldReturnAlertHistoryForInstance() throws Exception {
+        String instance = "consul-01:9107";
+
+        AlertHistorySnapshot snapshot = new AlertHistorySnapshot(
+                new AlertFingerprint("fp1"),
+                AlertStatus.FIRING,
+                "CPUHigh",
+                AlertSeverity.CRITICAL,
+                "prod",
+                instance,
+                "job-a",
+                Instant.parse("2026-08-06T20:57:11.872Z"),
+                Instant.parse("2026-08-06T20:57:12.000Z")
+        );
+
+        when(getAlertHistoryByInstanceUseCase.getHistoryByInstance(new GetAlertHistoryByInstanceQuery(
+                instance))).thenReturn(List.of(snapshot));
+
+        mockMvc
+                .perform(get("/api/v1/alerts/history").param("instance", instance))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.alerts").isArray())
+                .andExpect(jsonPath("$.alerts.length()").value(1))
+                .andExpect(jsonPath("$.alerts[0].fingerprint").value("fp1"))
+                .andExpect(jsonPath("$.alerts[0].status").value("FIRING"))
+                .andExpect(jsonPath("$.alerts[0].alert_name").value("CPUHigh"))
+                .andExpect(jsonPath("$.alerts[0].instance").value(instance));
+
+        verify(getAlertHistoryByInstanceUseCase).getHistoryByInstance(new GetAlertHistoryByInstanceQuery(
+                instance));
+    }
+
+    @Test
+    void shouldReturnEmptyHistoryForUnknownInstance() throws Exception {
+        String instance = "unknown:9107";
+
+        when(getAlertHistoryByInstanceUseCase.getHistoryByInstance(new GetAlertHistoryByInstanceQuery(
+                instance))).thenReturn(List.of());
+
+        mockMvc
+                .perform(get("/api/v1/alerts/history").param("instance", instance))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.alerts").isArray())
+                .andExpect(jsonPath("$.alerts").isEmpty());
+
+        verify(getAlertHistoryByInstanceUseCase).getHistoryByInstance(new GetAlertHistoryByInstanceQuery(
+                instance));
+    }
+
 }
