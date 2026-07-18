@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 public interface AlertHistoryJpaRepository extends JpaRepository<AlertHistoryEntity, UUID> {
@@ -52,4 +53,5 @@ public interface AlertHistoryJpaRepository extends JpaRepository<AlertHistoryEnt
                                       Instant receivedAt,
                                       String eventKey);
 
+    List<AlertHistoryEntity> findByInstance(String instance);
 }

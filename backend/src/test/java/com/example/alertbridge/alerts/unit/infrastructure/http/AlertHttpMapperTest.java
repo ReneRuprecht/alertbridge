@@ -2,9 +2,15 @@ package com.example.alertbridge.alerts.unit.infrastructure.http;
 
 import com.example.alertbridge.alerts.application.command.ReceiveAlertCommand;
 import com.example.alertbridge.alerts.application.command.ReceiveAlertsCommand;
+import com.example.alertbridge.alerts.application.query.GetAlertHistoryByInstanceQuery;
+import com.example.alertbridge.alerts.domain.model.AlertHistorySnapshot;
+import com.example.alertbridge.alerts.domain.value.AlertFingerprint;
+import com.example.alertbridge.alerts.domain.value.AlertSeverity;
+import com.example.alertbridge.alerts.domain.value.AlertStatus;
 import com.example.alertbridge.alerts.infrastructure.http.AlertHttpMapper;
 import com.example.alertbridge.alerts.infrastructure.http.request.PrometheusAlert;
 import com.example.alertbridge.alerts.infrastructure.http.request.PrometheusPayloadRequest;
+import com.example.alertbridge.alerts.infrastructure.http.response.AlertHistoryItemResponse;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -94,7 +100,65 @@ public class AlertHttpMapperTest {
         assertTrue(command.alerts().isEmpty());
     }
 
+    @Test
+    void shouldCreateQueryFromInstance() {
+        String instance = "instance-01";
 
+        GetAlertHistoryByInstanceQuery query =
+                AlertHttpMapper.toGetAlertHistoryByInstanceQuery(instance);
+
+        assertThat(query.instance())
+                .isEqualTo("instance-01");
+    }
+
+
+    @Test
+    void shouldMapSnapshotToResponse() {
+        Instant startsAt = Instant.parse("2026-01-01T10:00:00Z");
+        Instant receivedAt = Instant.parse("2026-01-01T10:01:00Z");
+
+        AlertHistorySnapshot snapshot = new AlertHistorySnapshot(
+                new AlertFingerprint("fp1"),
+                AlertStatus.FIRING,
+                "CPUHigh",
+                AlertSeverity.CRITICAL,
+                "production",
+                "instance-01",
+                "node-exporter",
+                startsAt,
+                receivedAt
+        );
+
+        AlertHistoryItemResponse response =
+                AlertHttpMapper.toAlertHistoryItemResponse(snapshot);
+
+        assertThat(response.fingerprint())
+                .isEqualTo("fp1");
+
+        assertThat(response.status())
+                .isEqualTo("FIRING");
+
+        assertThat(response.alertName())
+                .isEqualTo("CPUHigh");
+
+        assertThat(response.severity())
+                .isEqualTo("CRITICAL");
+
+        assertThat(response.environment())
+                .isEqualTo("production");
+
+        assertThat(response.instance())
+                .isEqualTo("instance-01");
+
+        assertThat(response.job())
+                .isEqualTo("node-exporter");
+
+        assertThat(response.startsAt())
+                .isEqualTo(startsAt);
+
+        assertThat(response.receivedAt())
+                .isEqualTo(receivedAt);
+    }
 
 }
 

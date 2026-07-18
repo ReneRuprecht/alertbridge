@@ -5,7 +5,7 @@ import com.example.alertbridge.alerts.domain.value.AlertFingerprint;
 import com.example.alertbridge.alerts.domain.value.AlertLabels;
 import com.example.alertbridge.alerts.domain.value.AlertSeverity;
 import com.example.alertbridge.alerts.domain.value.AlertStatus;
-import com.example.alertbridge.alerts.infrastructure.persistence.postgres.PostgresAlertHistoryAdapter;
+import com.example.alertbridge.alerts.infrastructure.persistence.postgres.PostgresAlertHistoryWriterAdapter;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -24,13 +24,13 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DataJpaTest
 @Testcontainers
-@Import(PostgresAlertHistoryAdapter.class)
-public class PostgresAlertHistoryAdapterIT {
+@Import(PostgresAlertHistoryWriterAdapter.class)
+public class PostgresAlertHistoryWriterAdapterIT {
 
     static PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:18-alpine");
 
     @Autowired
-    private PostgresAlertHistoryAdapter postgresAlertHistoryAdapter;
+    private PostgresAlertHistoryWriterAdapter postgresAlertHistoryWriterAdapter;
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
@@ -64,7 +64,7 @@ public class PostgresAlertHistoryAdapterIT {
                 Instant.parse("2026-01-01T00:00:00Z")
         );
 
-        postgresAlertHistoryAdapter.saveAll(List.of(alert));
+        postgresAlertHistoryWriterAdapter.saveAll(List.of(alert));
     }
 
 

@@ -1,6 +1,10 @@
 package com.example.alertbridge.alerts.infrastructure.persistence.postgres;
 
 import com.example.alertbridge.alerts.domain.model.Alert;
+import com.example.alertbridge.alerts.domain.model.AlertHistorySnapshot;
+import com.example.alertbridge.alerts.domain.value.AlertFingerprint;
+import com.example.alertbridge.alerts.domain.value.AlertSeverity;
+import com.example.alertbridge.alerts.domain.value.AlertStatus;
 import com.example.alertbridge.alerts.infrastructure.persistence.postgres.entity.AlertHistoryEntity;
 
 import java.util.UUID;
@@ -29,6 +33,20 @@ public class AlertHistoryEntityMapper {
                 alert.fingerprint().value(),
                 alert.status().name(),
                 alert.startsAt()
+        );
+    }
+
+    public static AlertHistorySnapshot toSnapshot(AlertHistoryEntity entity) {
+        return new AlertHistorySnapshot(
+                new AlertFingerprint(entity.getFingerprint()),
+                AlertStatus.of(entity.getStatus()),
+                entity.getAlertName(),
+                AlertSeverity.of(entity.getSeverity()),
+                entity.getEnvironment(),
+                entity.getInstance(),
+                entity.getJob(),
+                entity.getStartsAt(),
+                entity.getReceivedAt()
         );
     }
 
