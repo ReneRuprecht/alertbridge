@@ -9,11 +9,11 @@ import jakarta.transaction.Transactional;
 
 import java.util.List;
 
-public class PostgresAlertHistoryAdapter implements AlertHistoryWriterPort, AlertHistoryReaderPort {
+public class PostgresAlertHistoryWriterAdapter implements AlertHistoryWriterPort, AlertHistoryReaderPort {
 
     private final AlertHistoryJpaRepository alertHistoryJpaRepository;
 
-    public PostgresAlertHistoryAdapter(AlertHistoryJpaRepository alertHistoryJpaRepository) {
+    public PostgresAlertHistoryWriterAdapter(AlertHistoryJpaRepository alertHistoryJpaRepository) {
         this.alertHistoryJpaRepository = alertHistoryJpaRepository;
     }
 

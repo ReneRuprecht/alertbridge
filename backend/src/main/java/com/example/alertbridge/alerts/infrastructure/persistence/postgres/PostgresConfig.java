@@ -1,5 +1,6 @@
 package com.example.alertbridge.alerts.infrastructure.persistence.postgres;
 
+import com.example.alertbridge.alerts.domain.ports.AlertHistoryReaderPort;
 import com.example.alertbridge.alerts.domain.ports.AlertHistoryWriterPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,7 +9,12 @@ import org.springframework.context.annotation.Configuration;
 public class PostgresConfig {
 
     @Bean
-    AlertHistoryWriterPort postgresAlertHistoryAdapter(AlertHistoryJpaRepository alertHistoryJpaRepository) {
-        return new PostgresAlertHistoryAdapter(alertHistoryJpaRepository);
+    AlertHistoryWriterPort postgresAlertHistoryWriterAdapter(AlertHistoryJpaRepository alertHistoryJpaRepository) {
+        return new PostgresAlertHistoryWriterAdapter(alertHistoryJpaRepository);
+    }
+
+    @Bean
+    AlertHistoryReaderPort postgresAlertHistoryReaderAdapter(AlertHistoryJpaRepository alertHistoryJpaRepository) {
+        return new PostgresAlertHistoryReaderAdapter(alertHistoryJpaRepository);
     }
 }
