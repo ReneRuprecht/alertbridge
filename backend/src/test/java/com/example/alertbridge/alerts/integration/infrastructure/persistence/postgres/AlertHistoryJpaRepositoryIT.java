@@ -155,7 +155,7 @@ public class AlertHistoryJpaRepositoryIT {
     void shouldReturnOnlySnapshotsForRequestedInstance() {
         repository.save(createEntity("key", "instance-01"));
         repository.save(createEntity("key-2", "instance-01"));
-        repository.save(createEntity("key", "instance-02"));
+        repository.save(createEntity("key-3", "instance-02"));
 
         List<AlertHistoryEntity> result =
                 repository.findByInstance("instance-01");
