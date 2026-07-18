@@ -13,9 +13,11 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 @DataJpaTest
 @Testcontainers
@@ -42,7 +44,7 @@ public class AlertHistoryJpaRepositoryIT {
     @Test
     void shouldPersistAlertHistory() {
 
-        AlertHistoryEntity entity = createEntity("event-1");
+        AlertHistoryEntity entity = createEntity("event-1", "instance-01");
 
         repository.save(entity);
 
@@ -59,9 +61,9 @@ public class AlertHistoryJpaRepositoryIT {
     @Test
     void shouldIgnoreDuplicateEventKey() {
 
-        AlertHistoryEntity first = createEntity("same-event");
+        AlertHistoryEntity first = createEntity("same-event", "instance-01");
 
-        AlertHistoryEntity second = createEntity("same-event");
+        AlertHistoryEntity second = createEntity("same-event", "instance-01");
 
 
         repository.saveWithoutDuplicateEventKey(
@@ -105,7 +107,7 @@ public class AlertHistoryJpaRepositoryIT {
     }
 
 
-    private AlertHistoryEntity createEntity(String eventKey) {
+    private AlertHistoryEntity createEntity(String eventKey, String instance) {
 
         return new AlertHistoryEntity(
                 UUID.randomUUID(),
@@ -114,11 +116,53 @@ public class AlertHistoryJpaRepositoryIT {
                 "CPUHigh",
                 "CRITICAL",
                 "prod",
-                "instance-1",
+                instance,
                 "node-exporter",
                 Instant.parse("2026-01-01T00:00:00Z"),
                 Instant.parse("2026-01-01T00:01:00Z"),
                 eventKey
         );
+    }
+
+    @Test
+    void shouldReturnSnapshotsForInstance() {
+        AlertHistoryEntity entity = createEntity("key", "instance-01");
+
+        repository.save(entity);
+
+        List<AlertHistoryEntity> result =
+                repository.findByInstance("instance-01");
+
+        assertThat(result)
+                .hasSize(1)
+                .first()
+                .satisfies(snapshot -> {
+                    assertThat(snapshot.getInstance()).isEqualTo("instance-01");
+                    assertThat(snapshot.getStatus()).isEqualTo("FIRING");
+                    assertThat(snapshot.getFingerprint()).isEqualTo("fp-test-1");
+                });
+    }
+
+    @Test
+    void shouldReturnEmptyList_whenInstanceDoesNotExist() {
+        List<AlertHistoryEntity> result =
+                repository.findByInstance("unknown");
+
+        assertThat(result.isEmpty());
+    }
+
+    @Test
+    void shouldReturnOnlySnapshotsForRequestedInstance() {
+        repository.save(createEntity("key", "instance-01"));
+        repository.save(createEntity("key-2", "instance-01"));
+        repository.save(createEntity("key", "instance-02"));
+
+        List<AlertHistoryEntity> result =
+                repository.findByInstance("instance-01");
+
+        assertThat(result)
+                .hasSize(2)
+                .allMatch(snapshot ->
+                        snapshot.getInstance().equals("instance-01"));
     }
 }

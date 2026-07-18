@@ -1,13 +1,15 @@
 package com.example.alertbridge.alerts.infrastructure.persistence.postgres;
 
 import com.example.alertbridge.alerts.domain.model.Alert;
+import com.example.alertbridge.alerts.domain.model.AlertHistorySnapshot;
+import com.example.alertbridge.alerts.domain.ports.AlertHistoryReaderPort;
 import com.example.alertbridge.alerts.domain.ports.AlertHistoryWriterPort;
 import com.example.alertbridge.alerts.infrastructure.persistence.postgres.entity.AlertHistoryEntity;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
 
-public class PostgresAlertHistoryAdapter implements AlertHistoryWriterPort {
+public class PostgresAlertHistoryAdapter implements AlertHistoryWriterPort, AlertHistoryReaderPort {
 
     private final AlertHistoryJpaRepository alertHistoryJpaRepository;
 
@@ -40,5 +42,14 @@ public class PostgresAlertHistoryAdapter implements AlertHistoryWriterPort {
             );
         }
 
+    }
+
+    @Override
+    public List<AlertHistorySnapshot> findByInstance(String instance) {
+        return alertHistoryJpaRepository
+                .findByInstance(instance)
+                .stream()
+                .map(AlertHistoryEntityMapper::toSnapshot)
+                .toList();
     }
 }
