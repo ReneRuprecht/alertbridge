@@ -1,0 +1,35 @@
+name: Frontend
+
+on:
+  workflow_call:
+
+jobs:
+  test:
+    runs-on: self-hosted
+    container:
+      image: reneruprecht/ci-node24
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v7
+
+      - name: Cache Npm Packages
+        uses: actions/cache@v6
+        with:
+          path: ~/.npm
+          key: container-npm-${{ hashFiles('frontend/package-lock.json') }}
+          restore-keys: |
+            container-npm-
+
+      - name: Npm install
+        working-directory: ./frontend
+        run: |
+          npm ci
+
+      - name: Run tests
+        working-directory: ./frontend
+        run: |
+          npm run test:run
+
+      - name: Build frontend
+        working-directory: ./frontend
+        run: npm run build

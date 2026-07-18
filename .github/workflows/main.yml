@@ -19,13 +19,20 @@ jobs:
         filters: |
           backend:
             - 'backend/**'
+          frontend:
+            - 'frontend/**'
   backend:
     needs: changes
     if: needs.changes.outputs.backend == 'true'
     uses: ./.github/workflows/backend.yml
 
+  frontend:
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
+    uses: ./.github/workflows/frontend.yml
+
   ci-success:
-    needs: [changes, backend]
+    needs: [changes, backend, frontend]
     runs-on: self-hosted
     container:
       image: reneruprecht/ci-node24
