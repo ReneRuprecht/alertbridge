@@ -1,12 +1,8 @@
 import './App.css';
-import { AlertDashboardPage } from './features/alerts/pages/AlertDashboardPage';
+import { AppRouter } from './Router';
 
 function App() {
-  return (
-    <>
-      <AlertDashboardPage />
-    </>
-  );
+  return <AppRouter />;
 }
 
 export default App;
