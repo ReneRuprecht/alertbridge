@@ -1,5 +1,5 @@
+import type { Alert } from '../domain/alert';
 import { AlertMapper } from '../domain/alertMapper';
-import type { Alert } from '../types/alert';
 import type { CurrentAlertsResponse } from '../types/currentAlertsResponse';
 
 export async function getCurrentAlerts(): Promise<Alert[]> {

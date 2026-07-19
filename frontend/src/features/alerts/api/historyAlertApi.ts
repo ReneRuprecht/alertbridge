@@ -1,5 +1,5 @@
+import type { AlertHistory } from "../domain/alertHistory";
 import { AlertHistoryMapper } from "../domain/alertHistoryMapper";
-import type { AlertHistory } from "../types/alertHistory";
 import type { AlertHistoryResponse } from "../types/historyAlertsResponse";
 
 export async function getAlertHistory(instance: string): Promise<AlertHistory[]> {

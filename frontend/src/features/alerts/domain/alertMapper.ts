@@ -1,5 +1,5 @@
-import type { Alert } from "../types/alert";
 import type { CurrentAlertItemResponse } from "../types/currentAlertsResponse";
+import type { Alert } from "./alert";
 
 export class AlertMapper {
   static toAlert(response: CurrentAlertItemResponse): Alert {

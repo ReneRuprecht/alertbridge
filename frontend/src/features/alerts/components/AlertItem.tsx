@@ -1,4 +1,4 @@
-import type { Alert } from '../types/alert';
+import type { Alert } from "../domain/alert";
 
 interface AlertItemProps {
   alert: Alert;

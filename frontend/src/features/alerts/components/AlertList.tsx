@@ -1,4 +1,4 @@
-import type { Alert } from '../types/alert';
+import type { Alert } from '../domain/alert';
 import { AlertItem } from './AlertItem';
 
 interface AlertListProps {

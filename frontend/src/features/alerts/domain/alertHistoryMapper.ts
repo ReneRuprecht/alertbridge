@@ -1,5 +1,5 @@
-import type { AlertHistory } from '../types/alertHistory';
 import type { AlertHistoryItemResponse } from '../types/historyAlertsResponse';
+import type { AlertHistory } from './alertHistory';
 
 export class AlertHistoryMapper {
   static toAlertHistory(response: AlertHistoryItemResponse): AlertHistory {

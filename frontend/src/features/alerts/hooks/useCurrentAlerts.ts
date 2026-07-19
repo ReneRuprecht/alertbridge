@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import type { Alert } from '../types/alert';
 import { getCurrentAlerts } from '../api/alertApi';
+import type { Alert } from '../domain/alert';
 
 export function useCurrentAlerts() {
   const [alerts, setAlerts] = useState<Alert[]>([]);

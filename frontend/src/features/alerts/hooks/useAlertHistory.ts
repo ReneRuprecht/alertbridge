@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getAlertHistory } from '../api/historyAlertApi';
-import type { AlertHistory } from '../types/alertHistory';
+import type { AlertHistory } from '../domain/alertHistory';
 
 export function useAlertHistory(instance: string) {
   const [history, setHistory] = useState<AlertHistory[]>([]);

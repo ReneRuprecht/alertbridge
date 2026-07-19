@@ -1,4 +1,4 @@
-import type { AlertHistory } from "../types/alertHistory";
+import type { AlertHistory } from "../domain/alertHistory";
 
 interface AlertHistoryItemProps {
   alert: AlertHistory;
