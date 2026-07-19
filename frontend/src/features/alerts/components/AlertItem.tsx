@@ -1,12 +1,13 @@
-import type { Alert } from "../domain/alert";
+import type { Alert } from '../domain/alert';
 
 interface AlertItemProps {
   alert: Alert;
+  onClick: () => void;
 }
 
-export function AlertItem({ alert }: AlertItemProps) {
+export function AlertItem({ alert, onClick }: AlertItemProps) {
   return (
-    <div>
+    <div onClick={onClick}>
       <h3>{alert.alertName}</h3>
       <p>{alert.instance}</p>
       <p>{alert.job}</p>
