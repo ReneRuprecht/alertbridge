@@ -10,6 +10,7 @@ jobs:
       image: reneruprecht/ci-node24
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
     steps:
     - uses: actions/checkout@v7
 
