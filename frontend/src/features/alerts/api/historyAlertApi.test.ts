@@ -35,8 +35,8 @@ describe('getAlertHistory', () => {
 
     expect(fetch).toHaveBeenCalledWith('/api/v1/alerts/history?instance=node-01:9100');
 
-    expect(result.alerts).toHaveLength(1);
-    expect(result.alerts[0].alert_name).toBe('CPUHigh');
+    expect(result).toHaveLength(1);
+    expect(result[0].alertName).toBe('CPUHigh');
   });
 
   it('should throw error when request fails', async () => {
